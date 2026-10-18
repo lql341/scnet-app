@@ -1,7 +1,7 @@
 interface:
   display_name: "SCNet App"
-  short_description: "Adapt scientific apps to SCNet and Hygon Z100"
-  default_prompt: "Use $scnet-app to scaffold and validate a scientific application for Hygon Z100 compute on SCNet."
+  short_description: "Integrate apps with SCNet compute, scheduling and packaging"
+  default_prompt: "Use $scnet-app to integrate a scientific application with SCNet resources, Slurm scheduling and cluster packaging, following scnet-hashcat and checking the selected hardware/runtime."
 
 policy:
   allow_implicit_invocation: true
