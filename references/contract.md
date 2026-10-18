@@ -7,6 +7,10 @@ checker. The schema is [app.schema.json](../schema/app.schema.json); the CLI
 checks its used JSON Schema keywords plus path/target semantics. It is not a
 general-purpose JSON Schema engine.
 
+Apply the [cluster integration requirements](cluster-integration.md) for resource
+binding, Slurm allocation and runtime packaging; use the
+[scnet-hashcat mapping](hashcat-reference.md) as an implementation reference.
+
 | Field | Meaning |
 | --- | --- |
 | schema_version | Integer 1; future incompatible changes require another schema |

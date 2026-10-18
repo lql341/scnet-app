@@ -4,13 +4,16 @@
 
 版本：0.1.0
 
-面向[超算互联网（SCNet）](https://www.scnet.cn)集群环境的轻量元 skill，
-用于将 HPC、AI4S 和科学智能计算应用整理为应用 skill，优先适配 **海光 Z100 DCU / DTK**。
-它生成统一仓库和可审阅的 SCNet 作业计划，基础设施由
-[scnet-hpc](https://github.com/lql341/scnet-hpc) 提供，应用保留自己的科学逻辑及正确性检查。
+面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
+用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，
+覆盖**算力绑定、Slurm 调度、集群应用打包及结果验收**。
+基础设施由 [scnet-hpc](https://github.com/lql341/scnet-hpc) 提供，
+应用保留自己的科学逻辑及正确性检查。
+**海光（Hygon）Z100 DCU / DTK** 等硬件和运行时适配是集成流程中的一项能力。
 
-设计吸收了 [scnet-hashcat](https://github.com/lql341/scnet-hashcat) 的实践经验。
-已有分布式驱动不宣称由本工具生成，也未迁入本版单节点规范。
+[scnet-hashcat](https://github.com/lql341/scnet-hashcat) 是运行行为、打包和验证证据的标杆应用。
+[标杆对照](references/hashcat-reference_CN.md) 说明可复用做法与实现差异；
+它不是本工具生成的 v1 应用。
 
 ## 一句话安装
 
@@ -32,7 +35,7 @@ python3 scripts/scnet_app.py --help
 
 ## 一句话让 agent 适配应用
 
-> 使用 `$scnet-app` 把我提供的科学计算应用整理成 SCNet 应用 skill，优先适配海光 Z100；检查许可证和依赖，选择最小可用实现，补齐中英文安装使用说明，定义真实正确性检查，并准备 1 节点 1 DCU 的 SCNet 小测试计划；获得计算节点证据前保持未验证状态，没有授权预算时不提交作业。
+> 使用 `$scnet-app` 将我提供的科学计算应用接入 SCNet 算力：明确区域、队列和资源预算，遵循 Slurm 调度及目标集群打包要求，以 scnet-hashcat 为运行标杆，并核对所选硬件和运行时的兼容性，包括选用海光（Hygon）Z100 DCU 时的适配。补齐中英文安装使用说明、真实正确性检查及最小单节点测试计划；获得计算节点证据前保持未验证状态，实测遵循已授权预算。
 
 提供上游仓库/版本、代表性输入/参考值、已知环境限制；需要实测时说明算力预算。
 已有应用仓库可原地采用同一规范；init 只创建新目录，不覆盖已有工作。
@@ -76,7 +79,20 @@ plan 不预留远端目录，每次运行须选一个新的独立目录。
 凭证只走 scnet-hpc 的 setup、环境变量或系统存储。app.json 不保存 AK/SK、token、
 SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCNet 资源。
 
-## 范围和 Z100 适配
+## 集成规范与当前范围
+
+| 方面 | 应用须满足的要求 |
+| --- | --- |
+| SCNet 算力绑定 | 明确区域、profile、队列、实时账户权限和配额，以及 CPU/DCU/时长预算 |
+| Slurm 调度 | 通过基础设施提交；遵守资源分配和设备可见性，保留退出状态、作业标识及记账结果 |
+| 集群应用打包 | 显式上传清单、可复现依赖/构建说明、集群 module、计算节点 ABI，分离软件、输入、运行及产物目录 |
+| 正确性与证据 | 回收日志和约定产物，分别判断调度成功与科学/功能验收 |
+| 硬件和运行时 | 核对所选目标，包括海光（Hygon）Z100 DCU / DTK，保留实际设备和运行时证据 |
+
+详见[集群接入要求](references/cluster-integration_CN.md)和
+[scnet-hashcat 标杆对照](references/hashcat-reference_CN.md)。
+这些是本项目的应用接入约定，执行时以目标集群实际规范为准，不代表通用 SCNet 打包认证。
+`validate` 只检查应用描述和上传文件路径，不验证全部集群或运行时规范。
 
 脚手架默认 1 节点、共 8 核、1 DCU、3 分钟。内置区域、profile 和队列仅为
 执行配置示例，使用前在 app.json 中选择实际超算互联网集群环境，不代表实时可用性。
@@ -85,7 +101,7 @@ CPU 队列。实时调度/profile 事实优先于硬件提示。
 
 v0.1 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
 或远端软件部署；本脚手架不宣称任何应用已适配成功。
-ABI/工具链、算子/精度、显存和数值验证边界见[Z100 指南](references/hygon-z100_CN.md)。
+ABI/工具链、算子/精度、显存和数值验证边界见[Hygon Z100 DCU 指南](references/hygon-z100_CN.md)。
 
 目录采用 SKILL.md、agents、schema、scripts、assets、targets、references、tests 分层。
 共享基础能力调用 scnet-hpc，不再复制认证、文件或作业客户端。

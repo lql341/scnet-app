@@ -12,7 +12,7 @@ def main():
         properties = torch.cuda.get_device_properties(0)
         architecture = getattr(properties, "gcnArchName", "")
         if architecture.split(":")[0] != "gfx906":
-            raise RuntimeError("actual device architecture is not the Z100 profile's gfx906")
+            raise RuntimeError("actual device architecture is not the Hygon Z100 DCU profile's gfx906")
         left = torch.arange(64, dtype=torch.float32).reshape(8, 8) / 64
         right = left.T.contiguous()
         reference = left @ right

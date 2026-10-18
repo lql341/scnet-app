@@ -1,8 +1,10 @@
-# Hygon Z100 adaptation
+# Hygon Z100 DCU compatibility
 
 English | [中文](hygon-z100_CN.md)
 
-The priority target is Hygon **DCU Z100**, distinct from a Hygon C86 CPU. The
+One integration target is **Hygon Z100 DCU**, distinct from a Hygon C86 CPU. Apply
+the shared [resource, scheduler and packaging requirements](cluster-integration.md)
+alongside these hardware/runtime checks. The
 [versioned SCNet cluster profile](https://github.com/lql341/scnet-hpc/blob/0111b222087fbfe2196ca8f205aa35357e542ec8/clusters/kseshell.conf)
 provides gfx906 and device-memory/topology hints. They are not live evidence or a
 promise about every Hygon chip. targets/ records that source without copying

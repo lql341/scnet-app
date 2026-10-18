@@ -16,6 +16,10 @@ SCNet 账户、余额/配额、共享可写存储，以及计算节点上兼容�
 
 ## 适配和使用
 
+按[集群接入清单](references/cluster-integration_CN.md)落实 SCNet 算力绑定、
+Slurm 调度及运行包要求。运行行为参考标杆
+[scnet-hashcat](https://github.com/lql341/scnet-hashcat)，科学验收标准由本应用定义。
+
 1. 检查上游许可证、构建系统、依赖及代表性输入。
 2. 编辑 app.json：区域/队列、资源、module、显式文件列表、参考值/容差及应用验收条件。
 3. 实现 scripts/run.sh（计算节点）及 scripts/check.py（本地回收后检查）。
