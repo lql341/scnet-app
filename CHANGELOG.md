@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 (2026-10-18)
+
+- Add optional v1 fields for numeric/hook checks, pinned source/license and per-job
+  CPU/DCU/node/walltime caps; keep legacy packages readable.
+- Remove implicit cluster selection from new scaffolds; support external scnet/budget
+  binding. Block incomplete or over-budget submission vectors.
+- Add private record snapshots, source/result hashes, numeric acceptance, named
+  hook verdicts, mutation detection and checker timeout/failure logs.
+- Separate local correctness from read-only SCNet job confirmation and runtime
+  certification. Keep compute_verified false; do not treat self-reports as proof.
+- Revalidate integrity and source/binding scope without rerunning checkers; document
+  privacy, scientific holdout choice and compatibility upgrades.
+- Incorporate ScienceFlow evaluator/artifact separation lessons while retaining
+  scnet-hashcat as the operational reference; add budget/evidence regression tests.
+
 ## 0.1.0 (2026-10-18)
 
 - Position the meta-skill around SCNet resource binding, Slurm scheduling, cluster

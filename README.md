@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.1.0
+Version: 0.2.0
 
 A meta-skill for integrating HPC, AI4S and scientific applications with
 [SCNet](https://www.scnet.cn) compute resources. It standardizes **resource binding,
@@ -54,18 +54,21 @@ paths. Run these from the installed scnet-app root:
 ```bash
 python3 scripts/scnet_app.py init scnet-myapp --output ../scnet-myapp --upstream https://github.com/OWNER/PROJECT
 python3 scripts/scnet_app.py validate ../scnet-myapp
-python3 scripts/scnet_app.py plan ../scnet-myapp --scnet-hpc "/absolute/scnet-hpc" --remote-dir "/absolute/remote/fresh-run"
+python3 scripts/scnet_app.py plan ../scnet-myapp --binding "/private/binding.json" --scnet-hpc "/absolute/scnet-hpc" --remote-dir "/absolute/remote/fresh-run"
 ```
 
-The result is a scaffold, not a ported application. Edit app.json and implement the
-run/check hooks and scientific acceptance criterion. Stock hooks exit with failure;
-plan emits `submit: null` until they and the stock acceptance text are replaced.
-Packaging/plan success always reports `compute_verified: false`.
+The result is a scaffold, not a ported application. Implement the run/check hooks,
+human-readable acceptance and structured checks. Pin the upstream commit/archive
+hash and license in provenance. New scaffolds have no implicit cluster selection:
+configure app.json or copy and edit [binding.example.json](examples/binding.example.json)
+at the binding path above with your real profile/region/queue and authorized budget.
+The planner withholds submit while these facts/hooks are missing or a request
+exceeds its per-job budget. Existing v1 descriptors still load; new fields are additive.
 
 Then read [the contract](references/contract.md), run the read-only preflight:
 
 ```bash
-python3 scripts/scnet_app.py doctor ../scnet-myapp --scnet-hpc "/absolute/scnet-hpc"
+python3 scripts/scnet_app.py doctor ../scnet-myapp --binding "/private/binding.json" --scnet-hpc "/absolute/scnet-hpc"
 ```
 
 Review live account/queue/quota and the generated scnet-hpc `--dry-run` preview.
@@ -74,6 +77,20 @@ planned transfer/submission, bounded wait, status, explicit artifact downloads a
 cancellation. This authoring CLI executes no remote mutation. `plan` does not
 reserve the remote path: select a new dedicated directory for every run.
 
+After collecting outputs, record a private local acceptance result:
+
+```bash
+python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-id pilot-001 --artifacts metrics.json raw-output.dat scheduler.out --binding "/private/binding.json"
+```
+
+Replace artifact names with actual raw outputs/logs. The record freezes hashes,
+checks numeric criteria before the checker, and rejects input changes. Add
+`--job-id JOB_ID --remote-dir /absolute/remote/fresh-run --scnet-hpc /absolute/scnet-hpc`
+to check the platform's job facts through its read-only CLI. Local correctness,
+scheduler confirmation and hardware/runtime evidence are separate; v0.2 keeps
+`compute_verified: false`. See [acceptance and evidence](references/verification.md)
+for formats, failure/timeout handling, source labels and privacy limits.
+
 ## Prerequisites by stage
 
 | Stage | Required |
@@ -81,6 +98,7 @@ reserve the remote path: select a new dedicated directory for every run.
 | init / validate | Local Python 3.8+ and this complete repository |
 | plan | Also a local scnet-hpc >=0.6.13; adapter tested with 0.6.13; no credentials/network |
 | doctor | Also SCNet access, enabled region/queue and scnet-hpc credentials |
+| record | Authored checks, trusted local checker and explicit collected artifacts; optional --job-id also needs the doctor prerequisites |
 | Real application job | Account balance/quota, staged input/dependencies, shared writable storage, compatible application/DTK environment and requested devices |
 
 Set the scnet-hpc location with `--scnet-hpc`, `SCNET_HPC_ROOT`, or use the standard
@@ -104,13 +122,13 @@ project's integration conventions, applied with the target site's actual policie
 they are not a claim of universal SCNet packaging certification. `validate` checks
 the application descriptor and staged file paths, not every site/runtime policy.
 
-The scaffold starts with one node, eight **total** CPUs, one DCU and three minutes.
-Its bundled region/profile/queue values are execution examples; select the actual
-SCNet cluster environment in app.json before use. They are not current availability.
+The scaffold starts with one node, eight **total** CPUs, one DCU and three minutes,
+with matching per-job budget caps. Region 0 / unconfigured profile/queue block
+deployment until explicitly selected. Hardware profile hints are not live availability.
 `--target hygon-c86` explicitly creates a CPU application with zero DCUs and CPU
-queue defaults. Live scheduler/profile facts take precedence over hints.
+budget caps. Live scheduler/profile facts take precedence over hints.
 
-v0.1 standardizes **single-node** pilots. MPI, distributed fan-out, arrays, automatic
+v0.2 standardizes **single-node** pilots. MPI, distributed fan-out, arrays, automatic
 CUDA conversion and remote software deployment are not implemented. No application
 has been certified by this scaffold. See [Hygon Z100 DCU guidance](references/hygon-z100.md)
 for ABI/toolchain, operator/dtype, memory and numerical verification boundaries.
@@ -118,7 +136,9 @@ for ABI/toolchain, operator/dtype, memory and numerical verification boundaries.
 ```text
 SKILL.md / agents/      Authoring instructions and UI metadata
 schema/app.schema.json Application description v1
-scripts/scnet_app.py   init / validate / plan / doctor
+scripts/scnet_app.py   init / validate / plan / doctor / record
+scripts/scnet_evidence.py Private snapshots, acceptance and provenance checks
+examples/             Explicit environment binding and resource caps
 assets/application/   Application repository template
 assets/probes/        Optional compute-node framework probe
 targets/              Versioned hardware/profile hints, not live evidence
@@ -131,10 +151,11 @@ python3 -m unittest discover -s tests -v
 python3 scripts/validate_repo.py
 ```
 
-Initial verification: 12 behavior/conformance tests passed locally on Windows
-Python 3.12, including a real scnet-hpc offline submit preview with no credentials.
-Read-only doctor/resource-summary access to an SCNet cluster environment succeeded.
-No compute allocation or application adaptation was performed for this scaffold. CI runs Ubuntu Python
+v0.2 verification includes regression tests for budgets, binding, artifact/checker
+integrity, private records and job confirmation, plus a real scnet-hpc offline
+submit preview without credentials. Earlier v0.1 read-only doctor/resource-summary
+access succeeded. No compute allocation or application adaptation was performed
+for this release. CI runs Ubuntu Python
 3.8/3.12 and Windows Python 3.12; inspect its result for the current revision.
 
 MIT for the scaffold. Upstream applications/models/data retain their own licenses.

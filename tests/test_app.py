@@ -30,6 +30,9 @@ class ApplicationTests(unittest.TestCase):
     def ready(self):
         data = app.load_app(self.root)
         data["acceptance"] = "Compare scalar result to CPU reference 1.0 with absolute tolerance 1e-6."
+        data["checks"] = [{"name": "energy", "kind": "numeric", "required": True, "file": "metrics.json", "key": "energy", "ref": 1.0, "atol": 1e-6}]
+        data["provenance"] = {"revision": "a" * 40, "license": "MIT"}
+        data["scnet"] = {"backend": "openapi", "cluster": "kseshell", "region": "12345", "queue": "configured-queue"}
         (self.root / data["run"]).write_text("#!/usr/bin/env bash\nexit 0\n")
         (self.root / data["check"]).write_text("raise SystemExit(0)\n")
         self.write(data)
@@ -60,7 +63,7 @@ class ApplicationTests(unittest.TestCase):
         self.assertFalse(plan["compute_verified"])
         self.assertIn("--dry-run", plan["preview"])
         for command in plan["preflight"] + plan["prepare"] + plan["upload"]:
-            self.assertIn("<REGION_ID>", command)
+            self.assertIn("12345", command)
             self.assertIn("openapi", command)
 
     def test_paths_and_resource_values_cannot_escape_contract(self):
@@ -98,7 +101,7 @@ class ApplicationTests(unittest.TestCase):
         cpu = Path(self.tmp.name) / "cpu"
         app.init_app("scnet-cpu", cpu, "https://example.org/science", "hygon-c86")
         data = app.load_app(cpu)
-        self.assertEqual((data["target"], data["resources"]["dcus_per_node"], data["scnet"]["queue"]), ("hygon-c86", 0, "<QUEUE>"))
+        self.assertEqual((data["target"], data["resources"]["dcus_per_node"], data["scnet"]["queue"]), ("hygon-c86", 0, "unconfigured"))
 
     def test_remote_command_quotes_paths_without_shell_evaluation(self):
         data = self.ready()

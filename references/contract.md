@@ -23,6 +23,14 @@ binding, Slurm allocation and runtime packaging; use the
 | check | Relative Python hook executed locally after result collection; takes a results directory argument |
 | files | Explicit relative files staged in addition to app.json/run/check; preserve directory structure |
 | acceptance | Application-specific reference, tolerance or functional success condition |
+| provenance (optional v1 extension) | Exact upstream commit/source-archive SHA256 and license; required for a deployable plan |
+| budget (optional v1 extension) | Per-job max_nodes, max_cpus, max_dcus_per_node and max_walltime; required for a deployable plan |
+| checks (optional v1 extension) | Required numeric/hook verdicts and optional holdout metadata; required for record |
+
+Read [acceptance and evidence](verification.md) for formats, external binding,
+private records and v0.1 upgrades. Schema version stays 1; the CLI release is 0.2.0.
+Missing new fields do not break loading; deployment facts and checks gate submit
+and record respectively.
 
 Unknown fields are rejected so credentials/endpoints cannot become an alternative
 configuration channel. Use scnet-hpc for credentials and live resources. Artifact
@@ -43,7 +51,8 @@ reference and return nonzero when the numerical/functional condition fails. A
 dependencies documented; the authoring CLI itself remains standard-library-only.
 
 The stock hooks carry SCNET_APP_UNIMPLEMENTED and exit 2. The planner withholds a
-submit vector until both markers and the stock acceptance text are replaced.
+submit vector until markers/stock criteria are replaced and binding, provenance
+and an in-budget resource declaration are ready.
 Removing those markers does not certify an implementation. Packaging validation,
 API doctor, device probes, numerical correctness and performance are separate stages.
 
@@ -84,3 +93,6 @@ A generated application has its own version/license and bilingual README. Before
 publishing it, resolve upstream redistribution rights, supply the real repository's
 one-sentence install prompt and verify installation plus a minimal application case.
 No generated application repository is uploaded automatically.
+record stores private local artifacts and verdicts; optional job checking calls
+only scnet-hpc's read-only CLI. Source/result checksums are integrity aids, not
+independent hardware attestation. See [verification](verification.md).

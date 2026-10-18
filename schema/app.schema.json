@@ -40,6 +40,38 @@
     "run": {"type": "string"},
     "check": {"type": "string"},
     "files": {"type": "array", "items": {"type": "string"}},
-    "acceptance": {"type": "string", "minLength": 1}
+    "acceptance": {"type": "string", "minLength": 1},
+    "provenance": {
+      "type": "object", "additionalProperties": false, "required": ["revision", "license"],
+      "properties": {"revision": {"type": "string"}, "license": {"type": "string"}}
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_nodes", "max_cpus", "max_dcus_per_node", "max_walltime"],
+      "properties": {
+        "max_nodes": {"type": "integer", "minimum": 1},
+        "max_cpus": {"type": "integer", "minimum": 1},
+        "max_dcus_per_node": {"type": "integer", "minimum": 0},
+        "max_walltime": {"type": "string", "pattern": "^[0-9]+:[0-5][0-9]:[0-5][0-9]$"}
+      }
+    },
+    "checks": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["name", "kind", "required"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+          "kind": {"enum": ["numeric", "hook"]},
+          "required": {"type": "boolean"},
+          "holdout": {"type": "boolean"},
+          "file": {"type": "string", "minLength": 1},
+          "key": {"type": "string", "minLength": 1},
+          "ref": {"type": "number"},
+          "atol": {"type": "number"},
+          "rtol": {"type": "number"},
+          "criterion": {"type": "string", "minLength": 1}
+        }
+      }
+    }
   }
 }

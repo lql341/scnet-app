@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-版本：0.1.0
+版本：0.2.0
 
 面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
 用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，
@@ -48,23 +48,38 @@ python3 scripts/scnet_app.py --help
 ```bash
 python3 scripts/scnet_app.py init scnet-myapp --output ../scnet-myapp --upstream https://github.com/OWNER/PROJECT
 python3 scripts/scnet_app.py validate ../scnet-myapp
-python3 scripts/scnet_app.py plan ../scnet-myapp --scnet-hpc "/absolute/scnet-hpc" --remote-dir "/absolute/remote/fresh-run"
+python3 scripts/scnet_app.py plan ../scnet-myapp --binding "/private/binding.json" --scnet-hpc "/absolute/scnet-hpc" --remote-dir "/absolute/remote/fresh-run"
 ```
 
-产物是脚手架，尚未完成应用移植。编辑 app.json，实现运行/检查钩子及科学验收条件。
-原始钩子会失败退出；保留原始钩子或验收条件时，plan 的 `submit` 为 null。
-打包校验或计划生成成功始终仍显示 `compute_verified: false`。
+产物是脚手架，尚未完成应用移植。实现运行/检查钩子、供人阅读的 acceptance 和结构化 checks，
+在 provenance 固定上游提交/归档哈希及许可证。新脚手架不默认选择集群：
+编辑 app.json，或复制并修改 [binding.example.json](examples/binding.example.json)，
+在上面的绑定路径填写真实 profile、区域、队列及已授权预算。
+缺这些信息、钩子未实现或请求超过单作业预算时，submit 为 null。
+v1 描述继续可读，新增字段以兼容方式扩展。
 
 随后阅读[应用规范](references/contract_CN.md)，做只读预检：
 
 ```bash
-python3 scripts/scnet_app.py doctor ../scnet-myapp --scnet-hpc "/absolute/scnet-hpc"
+python3 scripts/scnet_app.py doctor ../scnet-myapp --binding "/private/binding.json" --scnet-hpc "/absolute/scnet-hpc"
 ```
 
 检查实时账户、队列、配额以及生成的 scnet-hpc `--dry-run` 预览。
 实现和授权预算就绪后，由 scnet-hpc 执行计划中的传输/提交、有限等待、状态查询、
 明确产物下载和取消。本元 skill CLI 不执行远端修改。
 plan 不预留远端目录，每次运行须选一个新的独立目录。
+
+回收后记录私有的本地验收结果：
+
+```bash
+python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-id pilot-001 --artifacts metrics.json raw-output.dat scheduler.out --binding "/private/binding.json"
+```
+
+将文件名换成实际原始输出及日志。记录冻结文件摘要，在执行检查器前计算数值判据，
+检查期间输入被修改会失败。另加 `--job-id JOB_ID --remote-dir /absolute/remote/fresh-run --scnet-hpc /absolute/scnet-hpc`
+可通过只读 CLI 核对平台作业事实。本地产物验收、调度核对和硬件/运行时证据分别报告；
+v0.2 的 compute_verified 保持 false。
+检查格式、超时/失败、来源标签及隐私边界见[验收与证据](references/verification_CN.md)。
 
 ## 分阶段前置条件
 
@@ -73,6 +88,7 @@ plan 不预留远端目录，每次运行须选一个新的独立目录。
 | init / validate | 本地 Python 3.8+ 和完整仓库 |
 | plan | 另需本地 scnet-hpc >=0.6.13，适配接口按 0.6.13 验证；不需凭证/联网 |
 | doctor | 另需 SCNet 网络、已开通区域/队列、scnet-hpc 凭证 |
+| record | 已实现的 checks、受信任的本地检查器及明确的回收产物；选用 --job-id 时还需 doctor 的前置条件 |
 | 真实应用作业 | 余额/配额、已准备输入/依赖、共享可写存储、兼容应用/DTK 环境和所申请设备 |
 
 用 `--scnet-hpc`、`SCNET_HPC_ROOT` 指定基础 skill 目录，或使用标准 Codex 安装位置。
@@ -94,12 +110,12 @@ SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCN
 这些是本项目的应用接入约定，执行时以目标集群实际规范为准，不代表通用 SCNet 打包认证。
 `validate` 只检查应用描述和上传文件路径，不验证全部集群或运行时规范。
 
-脚手架默认 1 节点、共 8 核、1 DCU、3 分钟。内置区域、profile 和队列仅为
-执行配置示例，使用前在 app.json 中选择实际超算互联网集群环境，不代表实时可用性。
+脚手架默认 1 节点、共 8 核、1 DCU、3 分钟，配同等单作业预算上限。
+区域 0 / unconfigured profile 和队列在明确选择前阻止部署，硬件 profile 提示不代表实时可用性。
 `--target hygon-c86` 显式生成 CPU 应用，默认零 DCU 和
-CPU 队列。实时调度/profile 事实优先于硬件提示。
+CPU 预算上限。实时调度/profile 事实优先于硬件提示。
 
-v0.1 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
+v0.2 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
 或远端软件部署；本脚手架不宣称任何应用已适配成功。
 ABI/工具链、算子/精度、显存和数值验证边界见[Hygon Z100 DCU 指南](references/hygon-z100_CN.md)。
 
@@ -111,9 +127,9 @@ python3 -m unittest discover -s tests -v
 python3 scripts/validate_repo.py
 ```
 
-首轮验证：Windows Python 3.12 上的 12 项行为/协议测试通过，包含真实 scnet-hpc
-无凭证离线提交预览；超算互联网集群环境的只读 doctor/resource-summary 接入成功。
-本脚手架未申请计算资源或完成实际应用适配。CI 覆盖 Ubuntu Python 3.8/3.12 和
+v0.2 验证包含预算、绑定、产物/检查器完整性、私有记录及作业核对的回归测试，
+以及真实 scnet-hpc 无凭证离线预览。v0.1 曾完成只读 doctor/resource-summary 接入。
+本版本未申请计算资源或完成实际应用适配。CI 覆盖 Ubuntu Python 3.8/3.12 和
 Windows Python 3.12，具体结果以当前提交检查为准。
 
 MIT 仅覆盖脚手架，上游应用、模型和数据遵循各自许可证。

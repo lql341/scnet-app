@@ -37,3 +37,14 @@ Before publishing a new application, verify clean skill installation, document
 remote deployment prerequisites, review its SCNet resource/Slurm plan, exercise
 failure handling, and run its smallest meaningful compute-node correctness case.
 Keep untested stages explicitly unverified.
+
+## Mapping the benchmark into acceptance records
+
+For the bundled single-node dictionary case, `report.json` provides `cracked`,
+`total_hashes`, `expected_ranks`, `reported_ranks` and `ok`. A reviewed adaptation
+can use numeric checks for `cracked == 5` and `total_hashes == 7`, plus a hook check
+for `ok` and matching expected/reported ranks. Retain the raw rank/device logs,
+summary and private run manifest, not only the counts. Counts are specific to this
+synthetic case, not arbitrary user workloads. See [verification](verification.md).
+This is an onboarding mapping, not a new app.json interface in scnet-hashcat or
+new compute-node validation for scnet-app.
