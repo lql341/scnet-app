@@ -45,7 +45,7 @@ def _configuration(root):
         raise ValueError("max_attempts must be an integer from 1 to 100")
     name = data["package_name"]
     match = re.fullmatch(r"([a-z0-9_]{1,20})-([0-9][0-9.]{0,19})-([a-z0-9_][a-z0-9_.]{0,49})\.tar", name) if isinstance(name, str) else None
-    if not match or match.group(2).endswith(".") or ".." in match.group(2) or not match.group(3)[0].isalnum() or not match.group(3)[-1].isalnum():
+    if not match or not match.group(1)[0].isalnum() or not match.group(1)[-1].isalnum() or match.group(2).endswith(".") or ".." in match.group(2) or not match.group(3)[0].isalnum() or not match.group(3)[-1].isalnum():
         raise ValueError("package_name must follow the official X-Y-Z.tar naming rules")
     runtime = data["runtime_evidence"]
     if not isinstance(runtime, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._/-]{0,127}", runtime) or ".." in Path(runtime).parts:
@@ -73,7 +73,7 @@ def gate(root, app, binding, verification, implementation_ready, deployment_bloc
     for name in required_docs:
         try:
             text = _file(root, name).read_text(encoding="utf-8")
-            if not text.strip() or any(marker in text for marker in ("__APP_NAME__", "Status: **unverified**", "状态：**未验证**", "Status: scaffold", "状态：脚手架")):
+            if not text.strip() or any(marker in text for marker in ("__APP_NAME__", "Status: **unverified**", "状态：**未验证**", "Status: scaffold", "状态：脚手架", "This generated application is unverified", "No cases have run yet")):
                 failures.append("complete delivery documentation: " + name)
         except (OSError, ValueError):
             failures.append("add delivery documentation: " + name)

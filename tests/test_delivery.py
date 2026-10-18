@@ -56,7 +56,7 @@ class DeliveryTests(unittest.TestCase):
         (self.root / "scripts/run.sh").write_text("#!/bin/bash\nset -e\nruntime/app/bin/science < runtime/case/testcase/input.txt > results/output.txt\n", encoding="utf-8")
         (self.root / "scripts/check.py").write_text('import json,sys\nprint(json.dumps({"checks":{}}))\n', encoding="utf-8")
         (self.root / "app.json").write_text(json.dumps(data), encoding="utf-8")
-        for name in ("README.md", "README_CN.md", "references/validation.md", "references/validation_CN.md"):
+        for name in ("README.md", "README_CN.md", "SKILL.md", "references/validation.md", "references/validation_CN.md", "tests/README.md"):
             (self.root / name).write_text("Tested application guidance and evidence.\n", encoding="utf-8")
         results = Path(self.tmp.name) / "collected"
         results.mkdir()
