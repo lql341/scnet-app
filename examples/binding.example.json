@@ -1,0 +1,14 @@
+{
+  "scnet": {
+    "backend": "openapi",
+    "cluster": "your-profile",
+    "region": "0",
+    "queue": "your-queue"
+  },
+  "budget": {
+    "max_nodes": 1,
+    "max_cpus": 8,
+    "max_dcus_per_node": 1,
+    "max_walltime": "00:03:00"
+  }
+}

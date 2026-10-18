@@ -23,7 +23,7 @@ respond in the user's language.
 - Hygon Z100 DCU/gfx906 and capacity in targets/ are versioned profile hints. Actual allocated
   compute-node evidence determines support. Do not infer dtype, Triton, custom
   operator, collective or model support from a product name or import success.
-- v0.1 plans one-node workloads only. MPI/fan-out/arrays require a later explicit
+- v0.2 plans one-node workloads only. MPI/fan-out/arrays require a later explicit
   execution contract; do not generate idle-node allocations or claim them supported.
 
 ## Adaptation workflow
@@ -40,8 +40,9 @@ respond in the user's language.
    For the selected hardware/runtime, check ABI, framework/compiler, kernels/dtypes
    and memory. Read references/hygon-z100.md for Hygon Z100 DCU/DTK; start with a
    minimal supported path, such as FP32, then test other required capabilities.
-4. Implement the Bash run hook and local Python checker. Define a reference and
-   numeric tolerance or functional criterion in app.json. Preserve application
+4. Implement the Bash run hook and local Python checker. Define acceptance and
+   structured numeric/hook checks; pin upstream revision/license and declare an
+   explicit binding and per-job budget. Read references/verification.md. Preserve application
    semantics; keep install/build, device/runtime, correctness and performance
    evidence distinct. Optional probes in assets/probes/ prove only their own scope.
 5. Validate packaging and generate a local SCNet plan. Use scnet-hpc doctor and
@@ -55,6 +56,8 @@ respond in the user's language.
    correctness check before claiming support. Scale only with separate evidence.
 7. Deliver English/Chinese install/prerequisite/use guidance and a sanitized
    compatibility report. Preserve detailed private run references separately.
+   Use record for collected artifacts; keep local correctness, platform job checking
+   and runtime evidence distinct. Self-reported success is not SCNet verification.
 
 ## Standard contract
 
@@ -64,8 +67,10 @@ Read [references/contract.md](references/contract.md) for fields and evidence.
 Follow [cluster integration](references/cluster-integration.md) for resource,
 scheduler and runtime packaging requirements and the
 [scnet-hashcat reference](references/hashcat-reference.md) for concrete examples.
-The stock hooks fail; a plan has submit=null until both hooks and acceptance text
-are replaced. That gate detects an unfinished scaffold, not correctness.
+The stock hooks fail; submit=null until hooks/acceptance, explicit binding, pinned
+provenance and an authorized per-job budget are ready and in range. Structured
+checks are required for record. Existing v1 packages remain readable. These gates
+do not certify correctness or enforce cumulative spend.
 
 Use one fixed target/region per plan, a new remote directory per run, explicit
 artifact lists and quoted arguments. Submit once. Wait timeout leaves a job active;
@@ -84,5 +89,9 @@ python3 scripts/scnet_app.py doctor ../scnet-myapp --scnet-hpc /absolute/scnet-h
 Replace example paths/source before use. init/validate are offline; plan additionally
 needs a local scnet-hpc >=0.6.13 installation but runs no commands. doctor is read-only
 and contacts SCNet. This CLI never uploads, submits, builds or installs remotely.
+record stores private snapshots and executes the trusted local checker; --job-id
+additionally calls scnet-hpc's read-only job command. See
+[acceptance and evidence](references/verification.md) before using it. Checksums
+are not tamper-proof signatures; no automatic hardware certification is provided.
 Chinese references: references/contract_CN.md, references/cluster-integration_CN.md,
-references/hashcat-reference_CN.md and references/hygon-z100_CN.md.
+references/hashcat-reference_CN.md, references/verification_CN.md and references/hygon-z100_CN.md.

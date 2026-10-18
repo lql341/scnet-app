@@ -13,6 +13,8 @@ import subprocess
 import sys
 from urllib.parse import urlsplit
 
+import scnet_evidence as evidence
+
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 DEFAULT_ACCEPTANCE = "Define an application-specific reference result and numerical/functional acceptance criteria before running."
@@ -30,8 +32,8 @@ def emit(value):
 def check_schema(value, schema, where="app"):
     """Evaluate exactly the JSON Schema keywords used by our bundled schema."""
     kind = schema.get("type")
-    types = {"object": dict, "array": list, "string": str, "integer": int}
-    if kind and (not isinstance(value, types[kind]) or kind == "integer" and isinstance(value, bool)):
+    types = {"object": dict, "array": list, "string": str, "integer": int, "number": (int, float), "boolean": bool}
+    if kind and (not isinstance(value, types[kind]) or kind in ("integer", "number") and isinstance(value, bool)):
         raise AppError(where + " must be " + kind)
     if "const" in schema and (value != schema["const"] or type(value) is not type(schema["const"])):
         raise AppError(where + " must equal " + repr(schema["const"]))
@@ -48,6 +50,8 @@ def check_schema(value, schema, where="app"):
             if key in value:
                 check_schema(value[key], child, where + "." + key)
     if isinstance(value, list):
+        if len(value) < schema.get("minItems", 0):
+            raise AppError(where + " has too few items")
         for index, item in enumerate(value):
             check_schema(item, schema.get("items", {}), where + "[" + str(index) + "]")
     if isinstance(value, str):
@@ -100,6 +104,7 @@ def load_app(root):
         raise AppError("walltime must be positive")
     if data["environment"]["modulefiles"]:
         remote_path(data["environment"]["modulefiles"])
+    evidence.validate_checks(data.get("checks", []))
     for relative in [data["run"], data["check"], *data["files"]]:
         local_file(root, relative)
     if not data["run"].endswith(".sh") or not data["check"].endswith(".py"):
@@ -122,12 +127,15 @@ def init_app(name, output, upstream, target):
     schema = json.loads((ROOT / "schema/app.schema.json").read_text(encoding="utf-8"))
     data = {
         "schema_version": 1, "name": name, "upstream": upstream, "target": target,
-        "scnet": {"backend": "openapi", "cluster": "kseshell", "region": "11250",
-                  "queue": "kshdnormal" if target == "hygon-z100" else "kshcnormal"},
+        "scnet": {"backend": "openapi", "cluster": "unconfigured", "region": "0", "queue": "unconfigured"},
         "resources": {"nodes": 1, "cpus": 8, "dcus_per_node": 1 if target == "hygon-z100" else 0, "walltime": "00:03:00"},
         "environment": {"modules": [], "modulefiles": ""},
         "run": "scripts/run.sh", "check": "scripts/check.py", "files": [],
-        "acceptance": DEFAULT_ACCEPTANCE
+        "acceptance": DEFAULT_ACCEPTANCE,
+        "provenance": {"revision": "", "license": ""},
+        "budget": {"max_nodes": 1, "max_cpus": 8, "max_dcus_per_node": 1 if target == "hygon-z100" else 0,
+                   "max_walltime": "00:03:00"},
+        "checks": [{"name": "primary", "kind": "hook", "required": True, "criterion": DEFAULT_ACCEPTANCE}]
     }
     check_schema(data, schema)
     url = urlsplit(upstream)
@@ -170,17 +178,52 @@ def base_argv(data, hpc):
 
 
 def implementation_ready(root, data):
-    return data["acceptance"] != DEFAULT_ACCEPTANCE and all(
+    return data["acceptance"] != DEFAULT_ACCEPTANCE and all(item.get("criterion") != DEFAULT_ACCEPTANCE for item in data.get("checks", [])) and all(
         "SCNET_APP_UNIMPLEMENTED" not in local_file(Path(root), data[key]).read_text(encoding="utf-8")
         for key in ("run", "check")
     )
 
 
-def plan(root, hpc, remote):
+def resolve_binding(data, path=None):
+    binding = {"scnet": data["scnet"], "budget": data.get("budget")}
+    if path:
+        override = evidence.read_object(Path(path))
+        if set(override) != {"scnet", "budget"}:
+            raise AppError("binding file requires exactly scnet and budget")
+        schema = evidence.read_object(ROOT / "schema/app.schema.json")["properties"]
+        for key in override:
+            check_schema(override[key], schema[key], "binding." + key)
+        binding = override
+    return binding
+
+
+def deployment_blocks(data, binding):
+    reasons = []
+    if binding["scnet"]["region"] == "0" or any(binding["scnet"][key] == "unconfigured" for key in ("cluster", "queue")):
+        reasons.append("Select an enabled SCNet cluster/region/queue in app.json or --binding.")
+    source = data.get("provenance", {})
+    if not re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", source.get("revision", "")) or not source.get("license", "").strip():
+        reasons.append("Record the exact upstream commit/archive SHA256 and license in provenance.")
+    budget = binding["budget"]
+    if not budget:
+        reasons.append("Declare an authorized per-job resource budget in app.json or --binding.")
+    else:
+        for field in ("nodes", "cpus", "dcus_per_node", "walltime"):
+            requested, maximum = data["resources"][field], budget["max_" + field]
+            if field == "walltime":
+                requested, maximum = evidence.seconds(requested), evidence.seconds(maximum)
+            if requested > maximum:
+                reasons.append("Resource request exceeds budget: " + field)
+    return reasons
+
+
+def plan(root, hpc, remote, binding_path=None):
     data = load_app(root)
     root = Path(root).resolve()
     remote = remote_path(remote)
-    base = base_argv(data, hpc)
+    binding = resolve_binding(data, binding_path)
+    bound = {**data, "scnet": binding["scnet"]}
+    base = base_argv(bound, hpc)
     script = ["set -euo pipefail", "cd " + shlex.quote(remote)]
     environment = data["environment"]
     if environment["modulefiles"]:
@@ -189,24 +232,29 @@ def plan(root, hpc, remote):
     script += ["mkdir -p results", "exec bash " + shlex.quote(data["run"])]
     command = shlex.join(["bash", "-l", "-c", "\n".join(script)])
     resources = data["resources"]
-    submit = ["submit", "--name", data["name"], "--queue", data["scnet"]["queue"],
+    submit = ["submit", "--name", data["name"], "--queue", binding["scnet"]["queue"],
               "--nodes", "1", "--cpus", str(resources["cpus"]),
               "--dcus", str(resources["dcus_per_node"]), "--walltime", resources["walltime"],
               "--work-dir", remote, "--command", command]
     files = sorted(set(["app.json", data["run"], data["check"], *data["files"]]))
     directories = sorted(set([remote, remote + "/results"] + [remote + "/" + str(PurePosixPath(f).parent) for f in files if str(PurePosixPath(f).parent) != "."]))
     ready = implementation_ready(root, data)
+    blocked = deployment_blocks(data, binding)
+    if not ready:
+        blocked.append("Implement run/check hooks and replace the stock acceptance condition.")
+    status = evidence.verification(root, data, binding)
     return {
-        "application": data["name"], "target": data["target"], "compute_verified": False,
+        "application": data["name"], "target": data["target"], **status,
+        "binding": binding,
         "implementation_ready": ready,
-        "blocked_by": [] if ready else ["Implement run/check hooks and replace the stock acceptance condition."],
+        "blocked_by": blocked,
         "effects": "No commands executed. Review the plan; pass live preflight and implement hooks before any remote mutation.",
         "remote_directory_rule": "Use a fresh dedicated path for each run; this planner does not reserve it.",
         "preflight": [base + ["doctor"], base + ["resource-summary"]],
         "prepare": [base + ["mkdir", directory, "--parents"] for directory in directories],
         "upload": [base + ["upload", str(root / relative), str(PurePosixPath(remote + "/" + relative).parent)] for relative in files],
         "preview": hpc + ["--dry-run"] + base[len(hpc):] + submit,
-        "submit": base + submit if ready else None,
+        "submit": base + submit if not blocked else None,
         "follow_up": {
             "status": base + ["job", "<job-id>"],
             "wait": base + ["wait", "<job-id>", "--wait-timeout", "900", "--interval", "15"],
@@ -218,6 +266,20 @@ def plan(root, hpc, remote):
     }
 
 
+def record(root, results, run_id, artifacts, binding_path=None, job_state="unknown", hpc=None, job_id=None, remote=None, timeout=300):
+    data = load_app(root)
+    if not implementation_ready(root, data) or not data.get("checks"):
+        raise AppError("Implement hooks, acceptance and structured checks before recording.")
+    binding = resolve_binding(data, binding_path)
+    job_command = None
+    if job_id:
+        if not hpc or not remote or deployment_blocks(data, binding):
+            raise AppError("Job verification requires a configured binding, provenance, budget and --remote-dir.")
+        remote = remote_path(remote)
+        job_command = base_argv({**data, "scnet": binding["scnet"]}, hpc) + ["--details", "job", job_id]
+    return evidence.record(root, data, binding, results, run_id, artifacts, job_state, job_command, job_id, remote, timeout)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=VERSION)
@@ -227,13 +289,22 @@ def main(argv=None):
     init.add_argument("--output", type=Path, required=True)
     init.add_argument("--upstream", required=True)
     init.add_argument("--target", choices=["hygon-z100", "hygon-c86"], default="hygon-z100")
-    for command in ("validate", "plan", "doctor"):
+    for command in ("validate", "plan", "doctor", "record"):
         child = sub.add_parser(command)
         child.add_argument("application", type=Path)
+        child.add_argument("--binding", type=Path, help="external JSON with explicit scnet and budget objects")
         if command != "validate":
             child.add_argument("--scnet-hpc", type=Path)
         if command == "plan":
             child.add_argument("--remote-dir", required=True)
+        if command == "record":
+            child.add_argument("--results", type=Path, required=True)
+            child.add_argument("--run-id", required=True)
+            child.add_argument("--artifacts", nargs="+", required=True, help="explicit relative result/log files; numeric check files are also included")
+            child.add_argument("--job-state", choices=evidence.JOB_STATES, default="unknown")
+            child.add_argument("--job-id")
+            child.add_argument("--remote-dir")
+            child.add_argument("--checker-timeout", type=int, default=300)
     args = parser.parse_args(argv)
     try:
         if args.op == "init":
@@ -241,11 +312,22 @@ def main(argv=None):
         elif args.op == "validate":
             data = load_app(args.application)
             emit({"application": data["name"], "packaging_ok": True,
-                  "implementation_ready": implementation_ready(args.application, data), "compute_verified": False})
+                  "implementation_ready": implementation_ready(args.application, data),
+                  "deployment_blocks": deployment_blocks(data, resolve_binding(data, args.binding)),
+                  **evidence.verification(args.application, data, resolve_binding(data, args.binding))})
         elif args.op == "plan":
-            emit(plan(args.application, hpc_cli(args.scnet_hpc), args.remote_dir))
+            emit(plan(args.application, hpc_cli(args.scnet_hpc), args.remote_dir, args.binding))
+        elif args.op == "record":
+            status = record(args.application, args.results, args.run_id, args.artifacts, args.binding, args.job_state,
+                            hpc_cli(args.scnet_hpc) if args.job_id else None, args.job_id, args.remote_dir, args.checker_timeout)
+            emit(status)
+            return 0 if status["verification"]["correctness"] == "passed" and (not args.job_id or status["verification"]["scheduler"] == "passed") else 1
         elif args.op == "doctor":
             data = load_app(args.application)
+            binding = resolve_binding(data, args.binding)
+            if binding["scnet"]["region"] == "0" or binding["scnet"]["cluster"] == "unconfigured" or binding["scnet"]["queue"] == "unconfigured":
+                raise AppError("Select an actual SCNet cluster/region/queue before doctor.")
+            data = {**data, "scnet": binding["scnet"]}
             base = base_argv(data, hpc_cli(args.scnet_hpc))
             results = []
             for operation in ("doctor", "resource-summary"):
