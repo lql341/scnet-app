@@ -4,8 +4,8 @@
 
 版本：0.1.0
 
-将 HPC、AI4S 和科学智能计算应用适配为 [SCNet](https://www.scnet.cn) 应用 skill 的
-轻量元 skill，优先面向 **海光 Z100 DCU / DTK**。
+面向[超算互联网（SCNet）](https://www.scnet.cn)集群环境的轻量元 skill，
+用于将 HPC、AI4S 和科学智能计算应用整理为应用 skill，优先适配 **海光 Z100 DCU / DTK**。
 它生成统一仓库和可审阅的 SCNet 作业计划，基础设施由
 [scnet-hpc](https://github.com/lql341/scnet-hpc) 提供，应用保留自己的科学逻辑及正确性检查。
 
@@ -78,8 +78,9 @@ SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCN
 
 ## 范围和 Z100 适配
 
-默认示例为昆山 `kseshell` / 区域 `<REGION_ID>` / `<QUEUE>`，1 节点、共 8 核、1 DCU、
-3 分钟，不代表实时可用性。`--target hygon-c86` 显式生成 CPU 应用，默认零 DCU 和
+脚手架默认 1 节点、共 8 核、1 DCU、3 分钟。内置区域、profile 和队列仅为
+执行配置示例，使用前在 app.json 中选择实际超算互联网集群环境，不代表实时可用性。
+`--target hygon-c86` 显式生成 CPU 应用，默认零 DCU 和
 CPU 队列。实时调度/profile 事实优先于硬件提示。
 
 v0.1 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
@@ -95,7 +96,7 @@ python3 scripts/validate_repo.py
 ```
 
 首轮验证：Windows Python 3.12 上的 12 项行为/协议测试通过，包含真实 scnet-hpc
-无凭证离线提交预览；昆山只读 doctor/resource-summary 接入成功。
+无凭证离线提交预览；超算互联网集群环境的只读 doctor/resource-summary 接入成功。
 本脚手架未申请计算资源或完成实际应用适配。CI 覆盖 Ubuntu Python 3.8/3.12 和
 Windows Python 3.12，具体结果以当前提交检查为准。
 
