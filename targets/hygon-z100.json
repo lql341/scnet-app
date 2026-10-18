@@ -3,7 +3,7 @@
   "kind": "dcu",
   "runtime_family": "DTK/HIP",
   "profile_hints": {"architecture": "gfx906", "memory_gib_per_device": 16, "devices_per_node": 4},
-  "evidence_type": "versioned SCNet Kunshan profile; not a live capability probe",
+  "evidence_type": "versioned SCNet cluster profile; not a live capability probe",
   "source": "https://github.com/lql341/scnet-hpc/blob/0111b222087fbfe2196ca8f205aa35357e542ec8/clusters/kseshell.conf",
   "required_compute_checks": ["actual architecture and runtime", "device allocation visibility", "needed operators/dtypes", "application reference result"],
   "automatic_cpu_fallback": false
