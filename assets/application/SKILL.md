@@ -15,6 +15,11 @@ Do not create a second OpenAPI client or credential store. Follow the English an
 Chinese README for installation/prerequisites and use the scnet-app planner when
 available. Offline planning needs no local accelerator.
 
+Read references/cluster-integration.md before deployment: bind the region/queue
+and resource budget, follow Slurm allocation and site packaging policy, and stage
+versioned dependencies explicitly. Use scnet-hashcat as an operational reference;
+retain this application's own correctness criterion and execution scope.
+
 Run only on the selected SCNet compute nodes. Verify the actual device/runtime;
 do not silently execute an accelerator workload on CPU. Capture raw private logs,
 exit status and application-specific numerical/functional evidence. Scheduler

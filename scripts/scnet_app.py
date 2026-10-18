@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffold scientific applications and plan SCNet jobs; no submission engine."""
+"""Integrate scientific apps with SCNet resources, scheduling and packaging plans."""
 from __future__ import annotations
 
 import argparse
@@ -93,7 +93,7 @@ def load_app(root):
     if len(data["name"]) > 64:
         raise AppError("skill names must be at most 64 characters")
     if data["target"] == "hygon-z100" and data["resources"]["dcus_per_node"] < 1:
-        raise AppError("Z100 target requires an explicit DCU allocation; no CPU fallback")
+        raise AppError("Hygon Z100 DCU target requires an explicit DCU allocation; no CPU fallback")
     if data["target"] == "hygon-c86" and data["resources"]["dcus_per_node"] != 0:
         raise AppError("C86 CPU target must request zero DCUs")
     if not any(int(part) for part in data["resources"]["walltime"].split(":")):

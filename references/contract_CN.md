@@ -6,6 +6,9 @@
 [JSON Schema](../schema/app.schema.json) 是字段定义；CLI 校验其中实际使用的关键字
 以及路径/目标语义，不是通用 JSON Schema 引擎。
 
+按[集群接入要求](cluster-integration_CN.md)落实算力绑定、Slurm 分配及运行包约定，
+通过 [scnet-hashcat 标杆对照](hashcat-reference_CN.md)查看具体实现参考。
+
 | 字段 | 含义 |
 | --- | --- |
 | schema_version | 整数 1；不兼容变更需新 schema |
