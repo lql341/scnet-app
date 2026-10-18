@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.2.0
+Version: 0.3.0
 
 A meta-skill for integrating HPC, AI4S and scientific applications with
 [SCNet](https://www.scnet.cn) compute resources. It standardizes **resource binding,
@@ -41,8 +41,20 @@ The optional PyTorch probe has its own remote framework prerequisite.
 
 > Use `$scnet-app` to integrate the scientific application I provide with SCNet compute: bind its region/queue and resource budget, follow Slurm scheduling and target-cluster packaging requirements, use scnet-hashcat as the operational reference, and check hardware/runtime compatibility including Hygon Z100 DCU when selected. Deliver English/Chinese install and use instructions, a real correctness check and a minimal single-node smoke plan. Keep compatibility unverified until compute-node evidence exists; use only the authorized compute budget.
 
+For a finished application rather than a scaffold, say: "Use `$scnet-app` on this
+source revision and my acceptance case; within the SCNet region/queue, total
+budget and maximum attempts I specify, repair and retest until the level-A gate
+passes, then deliver the installable `scnet-xxx` skill, SCNet runtime tar,
+English/Chinese installation and usage tutorial, runnable test case and evidence
+manifest; if a gate remains blocked, report the failed attempts and stop."
+
 Give the agent the upstream repository/revision, a representative input/reference,
 known environment constraints and your compute budget when a real test is wanted.
+For repeated adaptation through a finished `scnet-xxx` skill, specify the exact
+success criterion and maximum authorized attempts. Follow the
+[source-to-skill loop](references/adaptation-loop.md). The official SCNet
+source-built software packaging standard is the mandatory baseline; target
+compatibility and agent usability add further gates.
 Existing application repositories can adopt the contract in place; init only creates
 new repositories and never overwrites one.
 
@@ -80,14 +92,14 @@ reserve the remote path: select a new dedicated directory for every run.
 After collecting outputs, record a private local acceptance result:
 
 ```bash
-python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-id pilot-001 --artifacts metrics.json raw-output.dat scheduler.out --binding "/private/binding.json"
+python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-id pilot-001 --artifacts metrics.json runtime.json raw-output.dat scheduler.out --binding "/private/binding.json"
 ```
 
 Replace artifact names with actual raw outputs/logs. The record freezes hashes,
 checks numeric criteria before the checker, and rejects input changes. Add
 `--job-id JOB_ID --remote-dir /absolute/remote/fresh-run --scnet-hpc /absolute/scnet-hpc`
 to check the platform's job facts through its read-only CLI. Local correctness,
-scheduler confirmation and hardware/runtime evidence are separate; v0.2 keeps
+scheduler confirmation and hardware/runtime evidence are separate; v0.3 keeps
 `compute_verified: false`. See [acceptance and evidence](references/verification.md)
 for formats, failure/timeout handling, source labels and privacy limits.
 
@@ -100,6 +112,34 @@ for formats, failure/timeout handling, source labels and privacy limits.
 | doctor | Also SCNet access, enabled region/queue and scnet-hpc credentials |
 | record | Authored checks, trusted local checker and explicit collected artifacts; optional --job-id also needs the doctor prerequisites |
 | Real application job | Account balance/quota, staged input/dependencies, shared writable storage, compatible application/DTK environment and requested devices |
+| gate / build | Completed level-A `runtime/app`, `runtime/case`, `runtime/scripts`, bilingual instructions, accepted SCNet job and target runtime record; `build` needs a fresh local output directory |
+
+## From source to finished skill
+
+The generated `delivery.json` sets the level-A tar name, attempt limit and required
+runtime evidence file. Define the application's acceptance tests in `app.json`.
+Port the user-supplied source into `runtime/app/`, include a runnable short test in
+`runtime/case/testcase/`, `runtime/case/.check`, a site-adjusted `.slurm` example
+and `runtime/scripts/env.sh`. Stage every runtime file in `app.json` `files`, so
+the accepted job's source hashes cover the delivered payload. The optional
+`runtime/source/` holds redistributable source and build instructions.
+
+After each bounded test, use `record` to keep the result and failure logs. Then:
+
+```bash
+python3 scripts/scnet_app.py gate ../scnet-myapp --binding /private/binding.json
+python3 scripts/scnet_app.py build ../scnet-myapp --binding /private/binding.json --output /fresh/scnet-myapp-delivery
+```
+
+`gate` reports concrete blockers, the count of recorded attempts and whether a
+retry remains. It requires the latest current correctness record, matching SCNet
+job history, target-matched collected runtime evidence, level-A package layout,
+staged package files and completed bilingual guidance. `build` refuses a failed
+gate and creates a `scnet-xxx/` skill directory, `X-Y-Z.tar` runtime package and
+SHA256 manifest. This is a local delivery gate, not independent hardware or
+marketplace certification. It never submits or retries jobs by itself. Use a
+fresh run ID and remote directory for each authorized attempt; resolve wait
+timeouts before submitting another job.
 
 Set the scnet-hpc location with `--scnet-hpc`, `SCNET_HPC_ROOT`, or use the standard
 Codex skill installation directory. Credentials are handled only by scnet-hpc's
@@ -128,7 +168,7 @@ deployment until explicitly selected. Hardware profile hints are not live availa
 `--target hygon-c86` explicitly creates a CPU application with zero DCUs and CPU
 budget caps. Live scheduler/profile facts take precedence over hints.
 
-v0.2 standardizes **single-node** pilots. MPI, distributed fan-out, arrays, automatic
+v0.3 standardizes **single-node** pilots. MPI, distributed fan-out, arrays, automatic
 CUDA conversion and remote software deployment are not implemented. No application
 has been certified by this scaffold. See [Hygon Z100 DCU guidance](references/hygon-z100.md)
 for ABI/toolchain, operator/dtype, memory and numerical verification boundaries.
@@ -136,7 +176,8 @@ for ABI/toolchain, operator/dtype, memory and numerical verification boundaries.
 ```text
 SKILL.md / agents/      Authoring instructions and UI metadata
 schema/app.schema.json Application description v1
-scripts/scnet_app.py   init / validate / plan / doctor / record
+scripts/scnet_app.py   init / validate / plan / doctor / record / gate / build
+scripts/scnet_delivery.py Official-package and application-skill delivery gate
 scripts/scnet_evidence.py Private snapshots, acceptance and provenance checks
 examples/             Explicit environment binding and resource caps
 assets/application/   Application repository template
@@ -151,7 +192,7 @@ python3 -m unittest discover -s tests -v
 python3 scripts/validate_repo.py
 ```
 
-v0.2 verification includes regression tests for budgets, binding, artifact/checker
+v0.3 verification includes regression tests for budgets, binding, artifact/checker
 integrity, private records and job confirmation, plus a real scnet-hpc offline
 submit preview without credentials. Earlier v0.1 read-only doctor/resource-summary
 access succeeded. No compute allocation or application adaptation was performed

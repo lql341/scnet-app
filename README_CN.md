@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-版本：0.2.0
+版本：0.3.0
 
 面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
 用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，
@@ -37,7 +37,15 @@ python3 scripts/scnet_app.py --help
 
 > 使用 `$scnet-app` 将我提供的科学计算应用接入 SCNet 算力：明确区域、队列和资源预算，遵循 Slurm 调度及目标集群打包要求，以 scnet-hashcat 为运行标杆，并核对所选硬件和运行时的兼容性，包括选用海光（Hygon）Z100 DCU 时的适配。补齐中英文安装使用说明、真实正确性检查及最小单节点测试计划；获得计算节点证据前保持未验证状态，实测遵循已授权预算。
 
+若要成品，可说：“用 `$scnet-app` 处理我提供的源码版本和验收算例；在我指定的 SCNet
+区域/队列、总预算及最大次数内持续修复并重测，直到 A 级门槛通过，再交付可安装的
+`scnet-xxx` skill、SCNet 运行包 tar、中英文安装使用教程、可运行测试算例和证据清单；
+若门槛仍未过，就报告失败记录并停止。”
+
 提供上游仓库/版本、代表性输入/参考值、已知环境限制；需要实测时说明算力预算。
+若希望 agent 持续修复到交付 `scnet-xxx`，再给出明确成功判据和最大授权尝试次数。
+详见[源码到 skill 的适配循环](references/adaptation-loop_CN.md)。SCNet 官方源码编译软件封装
+是必过基线，海光等目标环境适配及 agent 可用性是额外验收。
 已有应用仓库可原地采用同一规范；init 只创建新目录，不覆盖已有工作。
 
 ## 最简流程
@@ -72,13 +80,13 @@ plan 不预留远端目录，每次运行须选一个新的独立目录。
 回收后记录私有的本地验收结果：
 
 ```bash
-python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-id pilot-001 --artifacts metrics.json raw-output.dat scheduler.out --binding "/private/binding.json"
+python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-id pilot-001 --artifacts metrics.json runtime.json raw-output.dat scheduler.out --binding "/private/binding.json"
 ```
 
 将文件名换成实际原始输出及日志。记录冻结文件摘要，在执行检查器前计算数值判据，
 检查期间输入被修改会失败。另加 `--job-id JOB_ID --remote-dir /absolute/remote/fresh-run --scnet-hpc /absolute/scnet-hpc`
 可通过只读 CLI 核对平台作业事实。本地产物验收、调度核对和硬件/运行时证据分别报告；
-v0.2 的 compute_verified 保持 false。
+v0.3 的 compute_verified 保持 false。
 检查格式、超时/失败、来源标签及隐私边界见[验收与证据](references/verification_CN.md)。
 
 ## 分阶段前置条件
@@ -90,6 +98,26 @@ v0.2 的 compute_verified 保持 false。
 | doctor | 另需 SCNet 网络、已开通区域/队列、scnet-hpc 凭证 |
 | record | 已实现的 checks、受信任的本地检查器及明确的回收产物；选用 --job-id 时还需 doctor 的前置条件 |
 | 真实应用作业 | 余额/配额、已准备输入/依赖、共享可写存储、兼容应用/DTK 环境和所申请设备 |
+| gate / build | 完整 A 级运行包、双语说明、通过的 SCNet 作业及目标运行时记录；build 另需全新本地输出目录 |
+
+## 从源码到成品 skill
+
+新脚手架的 `delivery.json` 定义 A 级 tar 名称、最大尝试次数及运行时证据文件。
+应用验收由 `app.json` 的 checks 定义。把程序和依赖放入 `runtime/app/`，
+把短算例、`.check`、目标环境 Slurm 示例放入 `runtime/case/`，
+环境脚本放入 `runtime/scripts/`，可再提供 `runtime/source/`。
+所有运行包文件须列入 `app.json` 的 files，确保被测试的源码摘要覆盖交付内容。
+每次作业后用 `record` 保存结果与失败日志，然后运行：
+
+```bash
+python3 scripts/scnet_app.py gate ../scnet-myapp --binding /private/binding.json
+python3 scripts/scnet_app.py build ../scnet-myapp --binding /private/binding.json --output /fresh/scnet-myapp-delivery
+```
+
+`gate` 检查最新正确性验收、SCNet 作业历史、目标运行时记录、官方 A 级包目录、
+文件暂存清单和双语教程，并列出剩余尝试次数。通过后 `build` 在本地生成 `scnet-xxx/`
+skill、`X-Y-Z.tar` 运行包和 SHA256 清单。它不自动提交或重试作业，也不构成独立硬件认证。
+每次重试使用新 run ID 和远端目录；等待超时先确认旧作业状态。
 
 用 `--scnet-hpc`、`SCNET_HPC_ROOT` 指定基础 skill 目录，或使用标准 Codex 安装位置。
 凭证只走 scnet-hpc 的 setup、环境变量或系统存储。app.json 不保存 AK/SK、token、
@@ -115,7 +143,7 @@ SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCN
 `--target hygon-c86` 显式生成 CPU 应用，默认零 DCU 和
 CPU 预算上限。实时调度/profile 事实优先于硬件提示。
 
-v0.2 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
+v0.3 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
 或远端软件部署；本脚手架不宣称任何应用已适配成功。
 ABI/工具链、算子/精度、显存和数值验证边界见[Hygon Z100 DCU 指南](references/hygon-z100_CN.md)。
 
@@ -127,7 +155,7 @@ python3 -m unittest discover -s tests -v
 python3 scripts/validate_repo.py
 ```
 
-v0.2 验证包含预算、绑定、产物/检查器完整性、私有记录及作业核对的回归测试，
+v0.3 验证包含预算、绑定、产物/检查器完整性、私有记录及作业核对的回归测试，
 以及真实 scnet-hpc 无凭证离线预览。v0.1 曾完成只读 doctor/resource-summary 接入。
 本版本未申请计算资源或完成实际应用适配。CI 覆盖 Ubuntu Python 3.8/3.12 和
 Windows Python 3.12，具体结果以当前提交检查为准。
