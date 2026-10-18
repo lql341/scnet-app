@@ -3,7 +3,7 @@
 English | [中文](hygon-z100_CN.md)
 
 The priority target is Hygon **DCU Z100**, distinct from a Hygon C86 CPU. The
-[versioned SCNet Kunshan profile](https://github.com/lql341/scnet-hpc/blob/0111b222087fbfe2196ca8f205aa35357e542ec8/clusters/kseshell.conf)
+[versioned SCNet cluster profile](https://github.com/lql341/scnet-hpc/blob/0111b222087fbfe2196ca8f205aa35357e542ec8/clusters/kseshell.conf)
 provides gfx906 and device-memory/topology hints. They are not live evidence or a
 promise about every Hygon chip. targets/ records that source without copying
 connection credentials/endpoints. Inspect the actual allocated node before using

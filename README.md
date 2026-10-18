@@ -86,8 +86,9 @@ Local installation does not install the scientific application or activate SCNet
 
 ## Scope and Z100 adaptation
 
-Defaults are Kunshan `kseshell` / region `11250` / `kshdnormal`, one node, eight
-**total** CPUs, one DCU and three minutes. They are examples, not current availability.
+The scaffold starts with one node, eight **total** CPUs, one DCU and three minutes.
+Its bundled region/profile/queue values are execution examples; select the actual
+SCNet cluster environment in app.json before use. They are not current availability.
 `--target hygon-c86` explicitly creates a CPU application with zero DCUs and CPU
 queue defaults. Live scheduler/profile facts take precedence over hints.
 
@@ -114,8 +115,8 @@ python3 scripts/validate_repo.py
 
 Initial verification: 12 behavior/conformance tests passed locally on Windows
 Python 3.12, including a real scnet-hpc offline submit preview with no credentials.
-Read-only Kunshan doctor/resource-summary succeeded. No compute allocation or
-application adaptation was performed for this scaffold. CI runs Ubuntu Python
+Read-only doctor/resource-summary access to an SCNet cluster environment succeeded.
+No compute allocation or application adaptation was performed for this scaffold. CI runs Ubuntu Python
 3.8/3.12 and Windows Python 3.12; inspect its result for the current revision.
 
 MIT for the scaffold. Upstream applications/models/data retain their own licenses.
