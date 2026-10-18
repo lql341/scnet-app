@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 (2026-10-18)
+
+- Add a source-to-skill adaptation loop with bounded recorded attempts and a
+  read-only delivery gate before building a finished agent skill and runtime tar.
+- Treat the SCNet 2025 source-built software packaging standard as the mandatory
+  level-A baseline, adding target-runtime evidence, SCNet job confirmation and
+  bilingual agent documentation.
+- Keep private attempts out of delivery and retain separate correctness,
+  scheduler and hardware-certification meanings.
+
 ## 0.2.0 (2026-10-18)
 
 - Add optional v1 fields for numeric/hook checks, pinned source/license and per-job

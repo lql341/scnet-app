@@ -51,6 +51,8 @@ def fingerprint(value):
 
 def source_hashes(root, data):
     names = sorted(set(["app.json", data["run"], data["check"], *data["files"]]))
+    if (Path(root) / "delivery.json").is_file():
+        names.append("delivery.json")
     return {name: sha256(safe_file(root, name)) for name in names}
 
 

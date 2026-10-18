@@ -5,6 +5,13 @@ English | [中文](README_CN.md)
 Version: 0.1.0. Upstream: __UPSTREAM__. Intended target: `__TARGET__`.
 Status: scaffold; no application or compute-node compatibility is claimed.
 
+Follow [the adaptation loop](references/adaptation-loop.md) to turn supplied
+source into a verified level-A software package and `scnet-xxx` skill. Complete
+delivery.json, runtime/app/, runtime/case/ and runtime/scripts/. After every
+recorded test, run scnet-app `gate`; `build` creates the skill and official tar
+only after all declared checks pass. Replace this scaffold text with the tested
+installation, prerequisites, one-command test and usage tutorial.
+
 ## Install and prerequisites
 
 Copy this complete skill into your agent's documented skill directory. After

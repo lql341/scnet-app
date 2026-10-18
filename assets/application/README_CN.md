@@ -5,6 +5,11 @@
 版本：0.1.0。上游：__UPSTREAM__。目标：`__TARGET__`。
 状态：脚手架，尚未声明应用或计算节点适配通过。
 
+按[源码到 skill 的适配循环](references/adaptation-loop_CN.md)完成 delivery.json、
+runtime/app/、runtime/case/、runtime/scripts/。每次测试后保存记录并运行 scnet-app `gate`；
+全部满足后由 `build` 生成 skill 和官方软件包。交付前把本段替换为实测过的中英文安装、
+前置条件、一键算例与使用教程。
+
 ## 安装和前置条件
 
 将完整 skill 放进 agent 文档规定的技能目录。应用仓库发布后，应将本段换成该仓库

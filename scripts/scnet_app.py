@@ -14,6 +14,7 @@ import sys
 from urllib.parse import urlsplit
 
 import scnet_evidence as evidence
+import scnet_delivery as delivery
 
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
@@ -148,7 +149,10 @@ def init_app(name, output, upstream, target):
             relative = source.relative_to(template)
             path = destination / relative
             path.parent.mkdir(parents=True, exist_ok=True)
-            text = source.read_text(encoding="utf-8").replace("__APP_NAME__", name).replace("__UPSTREAM__", upstream).replace("__TARGET__", target)
+            text = (source.read_text(encoding="utf-8").replace("__APP_NAME__", name)
+                    .replace("__UPSTREAM__", upstream).replace("__TARGET__", target)
+                    .replace("__PACKAGE_X__", name[6:][:20])
+                    .replace("__PACKAGE_Z__", "hygon_dtk" if target == "hygon-z100" else "hygon_c86"))
             with path.open("w", encoding="utf-8", newline="\n") as stream:
                 stream.write(text)
     (destination / "app.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
@@ -240,6 +244,7 @@ def plan(root, hpc, remote, binding_path=None):
     directories = sorted(set([remote, remote + "/results"] + [remote + "/" + str(PurePosixPath(f).parent) for f in files if str(PurePosixPath(f).parent) != "."]))
     ready = implementation_ready(root, data)
     blocked = deployment_blocks(data, binding)
+    blocked.extend(delivery.attempt_blocks(root))
     if not ready:
         blocked.append("Implement run/check hooks and replace the stock acceptance condition.")
     status = evidence.verification(root, data, binding)
@@ -289,7 +294,7 @@ def main(argv=None):
     init.add_argument("--output", type=Path, required=True)
     init.add_argument("--upstream", required=True)
     init.add_argument("--target", choices=["hygon-z100", "hygon-c86"], default="hygon-z100")
-    for command in ("validate", "plan", "doctor", "record"):
+    for command in ("validate", "plan", "doctor", "record", "gate", "build"):
         child = sub.add_parser(command)
         child.add_argument("application", type=Path)
         child.add_argument("--binding", type=Path, help="external JSON with explicit scnet and budget objects")
@@ -305,6 +310,8 @@ def main(argv=None):
             child.add_argument("--job-id")
             child.add_argument("--remote-dir")
             child.add_argument("--checker-timeout", type=int, default=300)
+        if command == "build":
+            child.add_argument("--output", type=Path, required=True, help="fresh directory for skill and runtime tar")
     args = parser.parse_args(argv)
     try:
         if args.op == "init":
@@ -322,6 +329,16 @@ def main(argv=None):
                             hpc_cli(args.scnet_hpc) if args.job_id else None, args.job_id, args.remote_dir, args.checker_timeout)
             emit(status)
             return 0 if status["verification"]["correctness"] == "passed" and (not args.job_id or status["verification"]["scheduler"] == "passed") else 1
+        elif args.op in ("gate", "build"):
+            data = load_app(args.application)
+            binding = resolve_binding(data, args.binding)
+            status = delivery.gate(args.application, data, binding,
+                                   evidence.verification(args.application, data, binding),
+                                   implementation_ready(args.application, data), deployment_blocks(data, binding))
+            if args.op == "gate":
+                emit(status)
+                return 0 if status["ready_to_build"] else 1
+            emit(delivery.build(args.application, data, status, args.output))
         elif args.op == "doctor":
             data = load_app(args.application)
             binding = resolve_binding(data, args.binding)
