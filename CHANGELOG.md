@@ -2,6 +2,7 @@
 
 ## 0.1.0 (2026-10-18)
 
+- Describe public scope as SCNet cluster environments; keep site selection in execution configuration.
 - Initial SCNet scientific-application authoring skill with Hygon Z100 as the default
   target and Hygon C86 as an explicit CPU target.
 - Standard-library init/validate/plan/read-only-doctor CLI; common JSON description,
