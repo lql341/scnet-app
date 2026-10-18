@@ -20,6 +20,11 @@ does not install the upstream application or open compute access.
 
 ## Adapt and use
 
+Follow the [cluster integration checklist](references/cluster-integration.md) for
+SCNet resource binding, Slurm scheduling and runtime packaging. The operational
+reference is [scnet-hashcat](https://github.com/lql341/scnet-hashcat); use the
+new application's own scientific acceptance criterion.
+
 1. Inspect the upstream license, build system, dependencies and representative input.
 2. Edit app.json: SCNet region/queue, requested resources, modules, explicit file
    list, and an application-specific acceptance condition with reference/tolerance.

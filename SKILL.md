@@ -1,6 +1,6 @@
 ---
 name: scnet-app
-description: Adapt or scaffold HPC, AI4S and scientific applications for SCNet compute, prioritizing Hygon Z100 DCU/DTK, with standardized packaging and application-specific verification.
+description: Integrate or scaffold HPC, AI4S and scientific applications for SCNet compute with explicit resource binding, Slurm scheduling, cluster packaging and application-specific verification, including Hygon Z100 DCU/DTK compatibility.
 ---
 
 # SCNet App
@@ -14,9 +14,13 @@ respond in the user's language.
 
 - scnet-hpc owns credentials, connections, resources, file transfer and scheduler
   lifecycle. Call its CLI; do not vendor another transport/authentication client.
-- Start with Hygon Z100 DCU/DTK. Hygon C86 CPU is an explicit separate target;
+- Bind applications to explicit SCNet resources and site packaging/scheduler policy.
+  Read references/cluster-integration.md; do not equate a valid package with runtime
+  certification. Use references/hashcat-reference.md as the operational benchmark.
+- The bundled default target is Hygon Z100 DCU/DTK, one compatibility path within
+  the integration workflow. Hygon C86 CPU is an explicit separate target;
   never silently fall back from DCU to CPU or CUDA compatibility to native HIP.
-- Z100/gfx906 and capacity in targets/ are versioned profile hints. Actual allocated
+- Hygon Z100 DCU/gfx906 and capacity in targets/ are versioned profile hints. Actual allocated
   compute-node evidence determines support. Do not infer dtype, Triton, custom
   operator, collective or model support from a product name or import success.
 - v0.1 plans one-node workloads only. MPI/fan-out/arrays require a later explicit
@@ -30,9 +34,12 @@ respond in the user's language.
 2. Generate a fresh application with scripts/scnet_app.py init. Do not overwrite
    existing work. For an existing repository, inspect it and adapt the same contract
    in place, preserving its useful application logic.
-3. Read references/hygon-z100.md for Z100 adaptation. Check host ABI, installed DTK,
-   framework/compiler, required kernels/dtypes, memory, data staging and network.
-   Prefer a minimal supported path, such as FP32, then test other capabilities.
+3. Bind the application to the actual SCNet region/profile/queue and resource budget.
+   Read references/cluster-integration.md for Slurm allocation semantics, staged
+   dependencies, modules, software/run/result separation and site policy checks.
+   For the selected hardware/runtime, check ABI, framework/compiler, kernels/dtypes
+   and memory. Read references/hygon-z100.md for Hygon Z100 DCU/DTK; start with a
+   minimal supported path, such as FP32, then test other required capabilities.
 4. Implement the Bash run hook and local Python checker. Define a reference and
    numeric tolerance or functional criterion in app.json. Preserve application
    semantics; keep install/build, device/runtime, correctness and performance
@@ -54,6 +61,9 @@ respond in the user's language.
 Each generated application uses app.json plus scripts/run.sh, scripts/check.py,
 SKILL.md, agents/, bilingual README, VERSION, CHANGELOG, tests and validation notes.
 Read [references/contract.md](references/contract.md) for fields and evidence.
+Follow [cluster integration](references/cluster-integration.md) for resource,
+scheduler and runtime packaging requirements and the
+[scnet-hashcat reference](references/hashcat-reference.md) for concrete examples.
 The stock hooks fail; a plan has submit=null until both hooks and acceptance text
 are replaced. That gate detects an unfinished scaffold, not correctness.
 
@@ -74,4 +84,5 @@ python3 scripts/scnet_app.py doctor ../scnet-myapp --scnet-hpc /absolute/scnet-h
 Replace example paths/source before use. init/validate are offline; plan additionally
 needs a local scnet-hpc >=0.6.13 installation but runs no commands. doctor is read-only
 and contacts SCNet. This CLI never uploads, submits, builds or installs remotely.
-Chinese references: references/contract_CN.md and references/hygon-z100_CN.md.
+Chinese references: references/contract_CN.md, references/cluster-integration_CN.md,
+references/hashcat-reference_CN.md and references/hygon-z100_CN.md.

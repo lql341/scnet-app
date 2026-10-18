@@ -1,8 +1,9 @@
-# 海光 Z100 适配
+# 海光（Hygon）Z100 DCU 兼容性
 
 [English](hygon-z100.md) | 中文
 
-优先目标为海光 **DCU Z100**，与海光 C86 CPU 分开。
+**海光（Hygon）Z100 DCU** 是一种集成目标，与海光 C86 CPU 分开。
+硬件和运行时检查须与[算力、调度及打包要求](cluster-integration_CN.md)共同执行。
 [固定版本超算互联网集群 profile](https://github.com/lql341/scnet-hpc/blob/0111b222087fbfe2196ca8f205aa35357e542ec8/clusters/kseshell.conf)
 提供 gfx906 及显存/拓扑提示，不是实时证据，也不能外推全部海光芯片。
 targets/ 只记来源，不复制连接凭证或接口。选择编译架构和依赖二进制前，检查实际分配节点。
