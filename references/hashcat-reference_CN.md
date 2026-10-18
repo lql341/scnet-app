@@ -29,3 +29,11 @@
 
 新应用发布前，验证干净环境安装，写明远端部署前置条件，审阅 SCNet 资源与 Slurm 计划，
 检查失败处理，并完成最小有意义的计算节点正确性测试。未测阶段明确标为未验证。
+
+## 将标杆映射到验收记录
+
+内置单节点字典案例的 report.json 包含 cracked、total_hashes、expected_ranks、
+reported_ranks、ok。经审阅的适配可用数值项检查 cracked == 5、total_hashes == 7，
+再用 hook 检查 ok 及预期/实报 rank 一致。保留原始 rank/设备日志、summary 及私有运行清单，
+不能只留数量。这些数量只适用于该合成案例，不能套到任意用户负载。见[验收规范](verification_CN.md)。
+这是接入映射说明，不为 scnet-hashcat 新增 app.json 接口，也不构成 scnet-app 的新计算节点验证。

@@ -8,6 +8,8 @@ description: Prepare and run __APP_NAME__ scientific workloads on SCNet with app
 Upstream: __UPSTREAM__. Intended target: `__TARGET__`.
 This generated application is unverified. Implement its run/result-check hooks and
 acceptance criteria before requesting a compute allocation.
+Pin provenance, declare authorized per-job budget caps and select the actual SCNet
+binding. Region 0/unconfigured defaults do not identify an enabled deployment.
 
 Read `app.json` for the SCNet target, budget, environment, artifact list and hooks.
 Use scnet-hpc for credentials, live resources, uploads, submit, wait, logs and cancel.
@@ -32,3 +34,6 @@ reports; keep credentials, account paths, job IDs and recovered/private data pri
 
 Read `references/validation.md` to record what was actually verified. Default
 documentation is English; respond in the user's language.
+For collected artifacts, follow references/verification.md and scnet-app record.
+Keep raw records private; distinguish local correctness, platform job checking and
+hardware/runtime evidence. A self-reported state is not platform confirmation.

@@ -27,7 +27,8 @@ new application's own scientific acceptance criterion.
 
 1. Inspect the upstream license, build system, dependencies and representative input.
 2. Edit app.json: SCNet region/queue, requested resources, modules, explicit file
-   list, and an application-specific acceptance condition with reference/tolerance.
+   list, pinned provenance (revision/license), authorized per-job budget, acceptance
+   and structured numeric/hook checks. New region 0/unconfigured values are blocked.
 3. Implement scripts/run.sh (compute node) and scripts/check.py (local collected
    results). Package all required application code/data in the explicit file list.
 4. Use scnet-app validate/plan, then scnet-hpc read-only preflight and submit preview.
@@ -35,6 +36,12 @@ new application's own scientific acceptance criterion.
 5. Run one bounded SCNet case after implementation. Download explicit result/log
    files, check scheduler accounting and exit status, then run the local checker.
 6. Record device/runtime and numerical/functional evidence in references/validation.md.
+
+Use an external scnet/budget binding when sharing this application across deployments.
+After collection, use scnet-app record with explicit raw result/log artifacts;
+records and snapshots stay in .private/evidence/. See
+[acceptance and evidence](references/verification.md). Local acceptance and optional
+platform job checking do not certify hardware compatibility.
 
 `results/` is the remote artifact directory. Heavy builds and accelerator probes
 belong in scheduled compute allocations. CPU baseline and DCU execution are separate
