@@ -21,6 +21,13 @@
 | check | 回收后在本地执行的相对 Python 检查器，参数为结果目录 |
 | files | 除 app.json/run/check 外要上传的显式相对文件，保留目录结构 |
 | acceptance | 应用参考结果、容差或功能成功判据 |
+| provenance（v1 可选扩展） | 精确上游提交/源码归档 SHA256 及许可证，可部署计划必需 |
+| budget（v1 可选扩展） | 单作业 max_nodes、max_cpus、max_dcus_per_node、max_walltime，可部署计划必需 |
+| checks（v1 可选扩展） | 数值/hook 必需项及可选 holdout 元数据，record 必需 |
+
+字段格式、外部绑定、私有记录及 v0.1 升级方式见[验收与证据](verification_CN.md)。
+schema_version 保持 1，元 skill 版本为 0.2.0。缺新字段仍能读取旧包，
+但部署信息不足不给 submit，缺 checks 不执行 record。
 
 未知字段会被拒绝，凭证/接口不能成为第二套配置通道。凭证和实时资源由 scnet-hpc
 管理。产物路径不能越过应用根目录，缺文件或逃逸软链接会失败。
@@ -35,7 +42,8 @@ check.py 在本地接收回收目录参数，须拒绝缺失/损坏产物，按�
 不满足数值/功能条件时返回非零。只检查文件存在通常不足以证明科学计算正确性。
 检查器有额外依赖时写清楚；元 skill CLI 自身保持只用标准库。
 
-原始钩子含 SCNET_APP_UNIMPLEMENTED 并退出 2。两个标记和原始验收文字都替换后，
+原始钩子含 SCNET_APP_UNIMPLEMENTED 并退出 2。标记/验收占位须替换，
+绑定、来源及预算也须就绪且未超限，之后
 planner 才给提交向量。移除标记不代表适配通过。
 打包、API doctor、设备探针、应用正确性和性能是独立阶段。
 
