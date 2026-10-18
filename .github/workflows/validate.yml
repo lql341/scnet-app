@@ -1,0 +1,41 @@
+name: Validate SCNet App
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  validate:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.8'
+          - os: ubuntu-latest
+            python: '3.12'
+          - os: windows-latest
+            python: '3.12'
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONIOENCODING: utf-8
+      SCNET_HPC_TEST_ROOT: ${{ github.workspace }}/_deps/scnet-hpc
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Checkout pinned infrastructure contract
+        uses: actions/checkout@v7
+        with:
+          repository: lql341/scnet-hpc
+          ref: 0111b222087fbfe2196ca8f205aa35357e542ec8
+          path: _deps/scnet-hpc
+          persist-credentials: false
+      - name: Behavior and real CLI dry-run contract
+        run: python -m unittest discover -s tests -v
+      - name: Repository and generated package
+        run: python scripts/validate_repo.py
+      - name: Shell syntax
+        if: runner.os == 'Linux'
+        run: bash -n assets/application/scripts/run.sh
+      - name: Diff hygiene
+        run: git diff --check

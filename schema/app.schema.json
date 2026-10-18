@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SCNet application description v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "upstream", "target", "scnet", "resources", "environment", "run", "check", "files", "acceptance"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "name": {"type": "string", "pattern": "^scnet-[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "upstream": {"type": "string", "pattern": "^https://[^\\s]+$"},
+    "target": {"enum": ["hygon-z100", "hygon-c86"]},
+    "scnet": {
+      "type": "object", "additionalProperties": false,
+      "required": ["backend", "cluster", "region", "queue"],
+      "properties": {
+        "backend": {"const": "openapi"},
+        "cluster": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$"},
+        "region": {"type": "string", "pattern": "^[0-9]+$"},
+        "queue": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$"}
+      }
+    },
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["nodes", "cpus", "dcus_per_node", "walltime"],
+      "properties": {
+        "nodes": {"type": "integer", "const": 1},
+        "cpus": {"type": "integer", "minimum": 1},
+        "dcus_per_node": {"type": "integer", "minimum": 0},
+        "walltime": {"type": "string", "pattern": "^[0-9]+:[0-5][0-9]:[0-5][0-9]$"}
+      }
+    },
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["modules", "modulefiles"],
+      "properties": {
+        "modules": {"type": "array", "items": {"type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._/+:-]*$"}},
+        "modulefiles": {"type": "string"}
+      }
+    },
+    "run": {"type": "string"},
+    "check": {"type": "string"},
+    "files": {"type": "array", "items": {"type": "string"}},
+    "acceptance": {"type": "string", "minLength": 1}
+  }
+}

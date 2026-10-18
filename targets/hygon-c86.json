@@ -1,0 +1,10 @@
+{
+  "target": "hygon-c86",
+  "kind": "cpu",
+  "runtime_family": "CPU application runtime",
+  "profile_hints": {"cpu_family": "Hygon C86", "host_architecture": "x86_64"},
+  "evidence_type": "versioned SCNet Kunshan profile; instruction/ABI support needs actual-node verification",
+  "source": "https://github.com/lql341/scnet-hpc/blob/0111b222087fbfe2196ca8f205aa35357e542ec8/clusters/kseshell.conf",
+  "required_compute_checks": ["actual CPU features and ABI", "application environment", "application reference result"],
+  "automatic_cpu_fallback": false
+}
