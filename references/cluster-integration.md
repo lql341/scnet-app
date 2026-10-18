@@ -5,7 +5,11 @@ English | [中文](cluster-integration_CN.md)
 Use this with the [application contract](contract.md) when authoring an application.
 It defines this project's delivery conventions. Obtain the selected cluster's
 software/module, storage, scheduler and redistribution policies before deployment;
-there is no assumed universal SCNet binary package format.
+For source-built software, the SCNet 2025 software-packaging standard supplied by
+the user is the baseline: `app/`, `case/`, `scripts/`, optional `source/`, and an
+`X-Y-Z.tar` archive. See [the adaptation loop](adaptation-loop.md). Check the
+selected cluster's extra policies; other application types may need a different
+runtime format.
 
 ## Resource binding and Slurm
 

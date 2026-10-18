@@ -28,7 +28,7 @@ binding, Slurm allocation and runtime packaging; use the
 | checks (optional v1 extension) | Required numeric/hook verdicts and optional holdout metadata; required for record |
 
 Read [acceptance and evidence](verification.md) for formats, external binding,
-private records and v0.1 upgrades. Schema version stays 1; the CLI release is 0.2.0.
+private records and v0.1 upgrades. Schema version stays 1; the CLI release is 0.3.0.
 Missing new fields do not break loading; deployment facts and checks gate submit
 and record respectively.
 

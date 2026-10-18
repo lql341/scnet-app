@@ -8,6 +8,9 @@ description: Prepare and run __APP_NAME__ scientific workloads on SCNet with app
 Upstream: __UPSTREAM__. Intended target: `__TARGET__`.
 This generated application is unverified. Implement its run/result-check hooks and
 acceptance criteria before requesting a compute allocation.
+Follow the source-to-skill process in references/adaptation-loop.md. Complete
+delivery.json and the official runtime/app, runtime/case and runtime/scripts
+package. Preserve each failed attempt and stop at the authorized retry limit.
 Pin provenance, declare authorized per-job budget caps and select the actual SCNet
 binding. Region 0/unconfigured defaults do not identify an enabled deployment.
 

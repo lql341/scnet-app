@@ -1,7 +1,7 @@
 interface:
   display_name: "SCNet App"
   short_description: "Integrate apps with SCNet compute, scheduling and packaging"
-  default_prompt: "Use $scnet-app to integrate a scientific application with SCNet resources, Slurm scheduling and cluster packaging, following scnet-hashcat and checking the selected hardware/runtime."
+  default_prompt: "Use $scnet-app to adapt my scientific application source into a tested SCNet skill. Follow the declared acceptance, authorized compute budget and bounded retries; deliver the level-A runtime package, bilingual install/use guide and runnable test case after the gate passes."
 
 policy:
   allow_implicit_invocation: true

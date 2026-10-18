@@ -1,0 +1,6 @@
+{
+  "standard_level": "A",
+  "package_name": "__PACKAGE_X__-0.1.0-__PACKAGE_Z__.tar",
+  "max_attempts": 5,
+  "runtime_evidence": "runtime.json"
+}
