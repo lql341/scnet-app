@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.private/
+work/
+outputs/
+_deps/
+results/

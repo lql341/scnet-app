@@ -1,0 +1,7 @@
+interface:
+  display_name: "__APP_NAME__"
+  short_description: "Scientific application workflows on SCNet compute"
+  default_prompt: "Use $__APP_NAME__ to prepare and validate an SCNet scientific workload."
+
+policy:
+  allow_implicit_invocation: true
