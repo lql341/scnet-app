@@ -167,6 +167,50 @@ class ApplicationTests(unittest.TestCase):
         output.encode("ascii")
         self.assertEqual(json.loads(output)["detail"], "计算节点")
 
+    def test_workflow_intake_run_status_and_resume_persist_attempts(self):
+        state = app.workflow_intake(self.root)
+        workflow = self.root / ".private" / "workflow"
+        self.assertEqual(state["current_state"], "inspect")
+        self.assertTrue((workflow / "state.json").is_file())
+        self.assertTrue((workflow / "attempts/0001/result.json").is_file())
+
+        result = app.workflow_run(self.root)
+        self.assertEqual(result["result"]["status"], "passed")
+        self.assertEqual(result["state"]["current_state"], "classify")
+        self.assertEqual(result["state"]["retries_used"], 0)
+        self.assertTrue((workflow / "attempts/0002/result.json").is_file())
+
+        app.workflow_run(self.root)
+        blocked = app.workflow_run(self.root)
+        self.assertEqual(blocked["result"]["status"], "blocked")
+        self.assertEqual(app.workflow_status(self.root)["status"], "blocked")
+        self.assertEqual(app.workflow_status(self.root)["retries_used"], 1)
+        explanation = app.workflow_explain_failure(self.root)
+        self.assertEqual(explanation["classification"], "change_strategy")
+        self.assertIn("strategy", explanation["guidance"] or "")
+        app.workflow_resume(self.root)
+        resumed = app.workflow_status(self.root)
+        self.assertEqual(resumed["status"], "active")
+        self.assertTrue(any(item.get("event") == "resume" for item in resumed["history"]))
+        self.assertTrue((workflow / "attempts/0004/result.json").is_file())
+
+    def test_workflow_rejects_duplicate_intake_and_resume_only_from_failure(self):
+        app.workflow_intake(self.root)
+        with self.assertRaises(app.AppError):
+            app.workflow_intake(self.root)
+        with self.assertRaises(app.AppError):
+            app.workflow_resume(self.root)
+
+    def test_workflow_attempt_limit_is_enforced_without_overwriting_attempts(self):
+        app.workflow_intake(self.root)
+        state = app.workflow_status(self.root)
+        state["max_attempts"] = 1
+        state["retries_used"] = 1
+        (self.root / ".private/workflow/state.json").write_text(json.dumps(state), encoding="utf-8")
+        with self.assertRaisesRegex(app.AppError, "retry limit"):
+            app.workflow_run(self.root)
+        self.assertTrue((self.root / ".private/workflow/attempts/0001/result.json").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

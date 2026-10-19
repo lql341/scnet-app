@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -347,6 +348,233 @@ def record(root, results, run_id, artifacts, binding_path=None, job_state="unkno
     return evidence.record(root, data, binding, results, run_id, artifacts, job_state, job_command, job_id, remote, timeout)
 
 
+WORKFLOW_STATES = (
+    "intake", "inspect", "classify", "plan", "cpu_build", "cpu_validate",
+    "dcu_probe", "dcu_port", "dcu_validate", "package", "clean_install", "release",
+)
+WORKFLOW_TERMINAL = ("passed", "blocked", "failed")
+WORKFLOW_FAILURE_CLASSES = (
+    "retry_same", "change_strategy", "needs_porting", "needs_user_decision", "unsupported",
+)
+
+
+def _workflow_dir(root):
+    return Path(root).resolve() / ".private" / "workflow"
+
+
+def _workflow_state_path(root):
+    return _workflow_dir(root) / "state.json"
+
+
+def _workflow_timestamp():
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def _workflow_read(root):
+    path = _workflow_state_path(root)
+    if not path.is_file() or path.is_symlink():
+        raise AppError("workflow has not been initialized; run intake first")
+    state = evidence.read_object(path)
+    if state.get("workflow_version") != 1 or state.get("current_state") not in WORKFLOW_STATES:
+        raise AppError("workflow state is invalid")
+    return state
+
+
+def _workflow_write(root, state):
+    directory = _workflow_dir(root)
+    directory.mkdir(parents=True, exist_ok=True)
+    temporary = directory / "state.json.tmp"
+    temporary.write_text(json.dumps(state, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    temporary.replace(directory / "state.json")
+
+
+def _workflow_max_attempts(root):
+    path = Path(root).resolve() / "delivery.json"
+    if not path.is_file():
+        return 1
+    try:
+        value = evidence.read_object(path).get("max_attempts", 1)
+    except (OSError, ValueError):
+        return 1
+    return value if type(value) is int and 1 <= value <= 100 else 1
+
+
+def _workflow_next_state(state, data):
+    current = state["current_state"]
+    if current == "classify":
+        return "cpu_build" if data["target"] == "hygon-c86" else "cpu_build"
+    if current == "cpu_validate":
+        return "package" if data["target"] == "hygon-c86" else "dcu_probe"
+    if current == "dcu_validate":
+        return "package"
+    if current == "clean_install":
+        return "release"
+    index = WORKFLOW_STATES.index(current)
+    return WORKFLOW_STATES[index + 1] if index + 1 < len(WORKFLOW_STATES) else current
+
+
+def _workflow_failure_class(stage, reason):
+    text = reason.lower()
+    if stage in ("dcu_probe", "dcu_port", "dcu_validate") or "compute" in text or "dcu" in text:
+        return "needs_porting"
+    if any(word in text for word in ("region", "queue", "budget", "binding", "license", "provenance", "authorization")):
+        return "needs_user_decision"
+    if stage in ("cpu_build", "package", "clean_install"):
+        return "change_strategy"
+    return "unsupported"
+
+
+def _workflow_attempt(root, state, result, failure=None):
+    attempts = _workflow_dir(root) / "attempts"
+    attempts.mkdir(parents=True, exist_ok=True)
+    number = state["step_attempt"] + 1
+    attempt = attempts / f"{number:04d}"
+    if attempt.exists():
+        raise AppError("workflow attempt directory already exists: " + str(attempt))
+    attempt.mkdir()
+    (attempt / "request.json").write_text(json.dumps({
+        "workflow_version": 1, "state": state["current_state"], "attempt": number,
+        "retries_used_before": state["retries_used"],
+        "created_at": _workflow_timestamp(),
+    }, indent=2) + "\n", encoding="utf-8")
+    (attempt / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    if failure:
+        (attempt / "failure.json").write_text(json.dumps(failure, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    return number, attempt
+
+
+def _workflow_execute(root, state, data):
+    stage = state["current_state"]
+    if stage == "inspect":
+        load_app(root)
+        return {"status": "passed", "detail": "application descriptor and declared files are readable"}
+    if stage == "classify":
+        strategy = "cpu-oracle-then-dcu" if data["target"] == "hygon-z100" else "cpu-build"
+        return {"status": "passed", "strategy": strategy, "target": data["target"]}
+    if stage == "plan":
+        preview = plan(root, ["scnet-hpc"], "/workflow/offline-preview")
+        if preview["blocked_by"]:
+            return {"status": "blocked", "detail": "offline plan is blocked", "blocked_by": preview["blocked_by"]}
+        return {"status": "passed", "detail": "offline plan generated", "submit_available": bool(preview["submit"])}
+    if stage == "cpu_build":
+        runtime_app = Path(root) / "runtime" / "app"
+        if not runtime_app.is_dir() or not any(runtime_app.rglob("*")):
+            return {"status": "blocked", "detail": "runtime/app is not populated; a CPU build or staged executable is required"}
+        return {"status": "passed", "detail": "runtime/app is populated"}
+    if stage == "cpu_validate":
+        status = evidence.verification(root, data, resolve_binding(data))
+        if status["verification"]["correctness"] != "passed":
+            return {"status": "blocked", "detail": "a passing CPU correctness record is required", "verification": status}
+        return {"status": "passed", "detail": "current CPU correctness evidence passed", "verification": status}
+    if stage in ("dcu_probe", "dcu_port", "dcu_validate"):
+        return {"status": "blocked", "detail": "compute-node DCU evidence is required; offline workflow does not claim accelerator support"}
+    if stage == "package":
+        status = delivery.gate(root, data, resolve_binding(data), evidence.verification(root, data, resolve_binding(data)),
+                               implementation_ready(root, data), deployment_blocks(data, resolve_binding(data)))
+        if not status["ready_to_build"]:
+            return {"status": "blocked", "detail": "delivery gate is not ready", "blocked_by": status["blocked_by"]}
+        return {"status": "passed", "detail": "delivery gate passed"}
+    if stage == "clean_install":
+        return {"status": "blocked", "detail": "clean-install replay requires a built package in a fresh output directory"}
+    if stage == "release":
+        return {"status": "blocked", "detail": "release requires an explicit build and reviewed compatibility report"}
+    return {"status": "failed", "detail": "unknown workflow state"}
+
+
+def workflow_intake(root):
+    root = Path(root).resolve()
+    if _workflow_state_path(root).exists():
+        raise AppError("workflow already initialized; use status or resume")
+    data = load_app(root)
+    state = {
+        "workflow_version": 1, "application": data["name"], "application_root": str(root),
+        "current_state": "intake", "status": "active", "step_attempt": 0,
+        "retries_used": 0,
+        "max_attempts": _workflow_max_attempts(root), "history": [], "last_failure": None,
+        "created_at": _workflow_timestamp(), "updated_at": _workflow_timestamp(),
+    }
+    number, attempt = _workflow_attempt(root, state, {"status": "passed", "detail": "intake accepted", "application": data["name"]})
+    state["step_attempt"] = number
+    state["history"].append({"attempt": number, "state": "intake", "status": "passed", "path": str(attempt.relative_to(root))})
+    state["current_state"] = "inspect"
+    state["updated_at"] = _workflow_timestamp()
+    _workflow_write(root, state)
+    return state
+
+
+def workflow_run(root):
+    root = Path(root).resolve()
+    state = _workflow_read(root)
+    if state["status"] != "active":
+        raise AppError("workflow is not active; use resume before another run")
+    if state["retries_used"] >= state["max_attempts"]:
+        raise AppError("workflow retry limit reached; obtain a revised authorized limit")
+    data = load_app(root)
+    stage = state["current_state"]
+    try:
+        result = _workflow_execute(root, state, data)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        result = {"status": "failed", "detail": str(exc)}
+    failure = None
+    if result["status"] in ("blocked", "failed"):
+        failure = {
+            "classification": _workflow_failure_class(
+                stage, result.get("detail", "") + " " + " ".join(result.get("blocked_by", []))
+            ),
+            "state": stage, "reason": result.get("detail", ""), "created_at": _workflow_timestamp(),
+        }
+    number, attempt = _workflow_attempt(root, state, result, failure)
+    state["step_attempt"] = number
+    if result["status"] in ("blocked", "failed"):
+        state["retries_used"] += 1
+    state["history"].append({"attempt": number, "state": stage, "status": result["status"],
+                             "path": str(attempt.relative_to(root))})
+    if result["status"] == "passed":
+        if stage == "release":
+            state["status"] = "passed"
+        else:
+            state["current_state"] = _workflow_next_state(state, data)
+    else:
+        state["status"] = result["status"]
+        state["last_failure"] = failure
+    state["updated_at"] = _workflow_timestamp()
+    _workflow_write(root, state)
+    return {"state": state, "result": result, "attempt": number}
+
+
+def workflow_resume(root):
+    root = Path(root).resolve()
+    state = _workflow_read(root)
+    if state["status"] not in ("blocked", "failed"):
+        raise AppError("workflow can only resume from blocked or failed")
+    if state["retries_used"] >= state["max_attempts"]:
+        raise AppError("workflow retry limit reached; obtain a revised authorized limit")
+    state["status"] = "active"
+    state["updated_at"] = _workflow_timestamp()
+    state["history"].append({"event": "resume", "state": state["current_state"], "at": state["updated_at"]})
+    _workflow_write(root, state)
+    return state
+
+
+def workflow_status(root):
+    return _workflow_read(Path(root).resolve())
+
+
+def workflow_explain_failure(root):
+    state = _workflow_read(Path(root).resolve())
+    failure = state.get("last_failure")
+    if not failure:
+        return {"status": state["status"], "message": "no recorded workflow failure", "current_state": state["current_state"]}
+    messages = {
+        "retry_same": "Retry the same stage after the transient condition is resolved.",
+        "change_strategy": "Change the build or packaging strategy, then resume with a fresh attempt.",
+        "needs_porting": "Complete target-runtime or DCU porting work before resuming.",
+        "needs_user_decision": "Resolve the missing binding, authorization, provenance or license decision.",
+        "unsupported": "The current workflow contract cannot support this stage or input.",
+    }
+    return {**failure, "guidance": messages.get(failure["classification"], "Review the recorded failure.")}
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=VERSION)
@@ -356,7 +584,8 @@ def main(argv=None):
     init.add_argument("--output", type=Path, required=True)
     init.add_argument("--upstream", required=True)
     init.add_argument("--target", choices=["hygon-z100", "hygon-c86"], default="hygon-z100")
-    for command in ("validate", "plan", "doctor", "record", "gate", "build"):
+    for command in ("validate", "plan", "doctor", "record", "gate", "build",
+                    "intake", "run", "status", "resume", "explain-failure"):
         child = sub.add_parser(command)
         child.add_argument("application", type=Path)
         child.add_argument("--binding", type=Path, help="external JSON with explicit scnet and budget objects")
@@ -378,6 +607,16 @@ def main(argv=None):
     try:
         if args.op == "init":
             emit(init_app(args.name, args.output, args.upstream, args.target))
+        elif args.op == "intake":
+            emit(workflow_intake(args.application))
+        elif args.op == "run":
+            emit(workflow_run(args.application))
+        elif args.op == "status":
+            emit(workflow_status(args.application))
+        elif args.op == "resume":
+            emit(workflow_resume(args.application))
+        elif args.op == "explain-failure":
+            emit(workflow_explain_failure(args.application))
         elif args.op == "validate":
             data = load_app(args.application)
             emit({"application": data["name"], "packaging_ok": True,
