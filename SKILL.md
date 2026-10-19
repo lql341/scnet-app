@@ -119,6 +119,10 @@ runtime support. The level-A runner checks package behavior locally; it is not a
 replacement for SCNet scheduler or device evidence. Workflow state and immutable
 attempts are stored under `.private/workflow/`.
 
+For a supplied directory or archive, inspect first with
+`python3 scripts/scnet_app.py inspect-source /path/to/input --output intake.json`.
+This records the input class and provenance without executing its build logic.
+
 Replace example paths/source before use. init/validate are offline; plan additionally
 needs a local scnet-hpc >=0.6.13 installation but runs no commands. doctor is read-only
 and contacts SCNet. This CLI never uploads, submits, builds or installs remotely.

@@ -585,7 +585,7 @@ def main(argv=None):
     init.add_argument("--output", type=Path, required=True)
     init.add_argument("--upstream", required=True)
     init.add_argument("--target", choices=["hygon-z100", "hygon-c86"], default="hygon-z100")
-    for command in ("validate", "plan", "doctor", "record", "gate", "build", "level-a", "quick-build",
+    for command in ("validate", "plan", "doctor", "record", "gate", "build", "level-a", "quick-build", "inspect-source",
                     "intake", "run", "status", "resume", "explain-failure"):
         child = sub.add_parser(command)
         if command in ("level-a", "quick-build"):
@@ -600,6 +600,10 @@ def main(argv=None):
             child.add_argument("--input", default="hello\n")
             child.add_argument("--expected", default="hello\n")
             child.add_argument("--binary")
+            continue
+        if command == "inspect-source":
+            child.add_argument("source", type=Path)
+            child.add_argument("--output", type=Path)
             continue
         child.add_argument("application", type=Path)
         child.add_argument("--binding", type=Path, help="external JSON with explicit scnet and budget objects")
@@ -629,6 +633,10 @@ def main(argv=None):
             from scnet_quickbuild import build
             emit(build(args.source, args.output, args.name, args.upstream,
                        args.input, args.expected, args.binary))
+            return 0
+        elif args.op == "inspect-source":
+            from scnet_intake import inspect
+            emit(inspect(args.source, args.output))
             return 0
         elif args.op == "intake":
             emit(workflow_intake(args.application))

@@ -89,6 +89,18 @@ local package checks and keeps accelerator evidence declarative. The workflow
 commands persist resumable state under `.private/workflow/` and preserve failed
 attempts.
 
+For an arbitrary input, inspect it before selecting an adapter:
+
+```bash
+python3 scripts/scnet_app.py inspect-source /path/to/source-or-package \
+  --output ./intake.json
+```
+
+The inspector safely accepts source directories, tar/zip archives, installed
+layouts and existing skill repositories. It records a deterministic tree hash,
+build markers, license-file candidates and the next supported action; it does
+not execute untrusted build scripts.
+
 The result is a scaffold, not a ported application. Implement the run/check hooks,
 human-readable acceptance and structured checks. Pin the upstream commit/archive
 hash and license in provenance. New scaffolds have no implicit cluster selection:
