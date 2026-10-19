@@ -87,9 +87,9 @@ EOF
 echo "== mpi C =="
 mpicc "${PROBE_DIR}/mpi_probe.c" -o "${PROBE_DIR}/mpi_probe" || fail "mpi C compile"
 echo "== pstl C++ =="
-g++ -std=c++17 "${PROBE_DIR}/pstl_probe.cpp" -o "${PROBE_DIR}/pstl_probe" || fail "PSTL C++ compile"
+g++ -std=c++17 -D_PSTL_PAR_BACKEND_SERIAL "${PROBE_DIR}/pstl_probe.cpp" -o "${PROBE_DIR}/pstl_probe" || fail "PSTL serial C++ compile"
 echo "== mpi C++ + PSTL =="
-mpicxx -std=c++17 "${PROBE_DIR}/mpi_cpp_probe.cpp" -o "${PROBE_DIR}/mpi_cpp_probe" || fail "MPI C++/PSTL compile"
+mpicxx -std=c++17 -D_PSTL_PAR_BACKEND_SERIAL "${PROBE_DIR}/mpi_cpp_probe.cpp" -o "${PROBE_DIR}/mpi_cpp_probe" || fail "MPI C++/PSTL serial compile"
 
 if [[ -x "${PROBE_DIR}/mpi_probe" ]]; then
     "${PROBE_DIR}/mpi_probe" || fail "mpi C run"

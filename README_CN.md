@@ -141,6 +141,10 @@ SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCN
 这些是本项目的应用接入约定，执行时以目标集群实际规范为准，不代表通用 SCNet 打包认证。
 `validate` 只检查应用描述和上传文件路径，不验证全部集群或运行时规范。
 
+OpenFOAM v2606 在昆山的远端构建、工具链探针、独立源码树约束及成功门槛见
+[OpenFOAM 远端构建验收](references/openfoam-validation_CN.md)。该流程不会在本机编译
+OpenFOAM，也不会把 `Allwmake` 返回 0 单独当作成功。
+
 脚手架默认 1 节点、共 8 核、1 DCU、3 分钟，配同等单作业预算上限。
 区域 0 / unconfigured profile 和队列在明确选择前阻止部署，硬件 profile 提示不代表实时可用性。
 `--target hygon-c86` 显式生成 CPU 应用，默认零 DCU 和
