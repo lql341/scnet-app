@@ -46,6 +46,9 @@ checker helpers, inputs and dependency lock/manifests in the explicit `files` li
 so source hashes cover them. Existing app.json v1 remains readable: add optional
 fields without deleting its acceptance text. Legacy descriptors without a budget
 or pinned provenance validate as packages but cannot emit a deployable submit plan.
+New applications must also freeze the complete six-axis `stack` signature and
+`validation.criterion_version`. The record stores the normalized signature after
+external binding platform values are applied.
 
 ## Resource binding and budget
 

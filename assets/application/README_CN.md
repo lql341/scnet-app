@@ -26,15 +26,17 @@ Slurm 调度及运行包要求。运行行为参考标杆
 [scnet-hashcat](https://github.com/lql341/scnet-hashcat)，科学验收标准由本应用定义。
 
 1. 检查上游许可证、构建系统、依赖及代表性输入。
-2. 编辑 app.json：区域/队列、资源、module、显式文件、固定版本/许可证 provenance、
-   已授权单作业 budget、acceptance 及数值/hook checks。默认区域 0/unconfigured 会阻止提交。
+2. 编辑 app.json：区域/队列、完整六轴 stack、prerequisites、资源、module、显式文件、
+   固定版本/许可证 provenance、已授权单作业 budget、acceptance 及数值/hook checks。
+   默认区域 0/unconfigured 会阻止提交。
 3. 实现 scripts/run.sh（计算节点）及 scripts/check.py（本地回收后检查）。
    所需代码和数据须列入显式文件列表。
 4. 用 scnet-app validate/plan 检查，再做 scnet-hpc 只读预检和提交预览。
    保留原始钩子或验收占位条件时，planner 不给出提交命令。
 5. 实现后在 SCNet 上跑一个限额案例，下载明确的结果/日志文件，核对记账与退出状态，
    再执行本地结果检查器。
-6. 在 references/validation_CN.md 记录设备、运行时及数值/功能证据。
+6. 在 references/prerequisites_CN.md 和 references/validation_CN.md 记录栈、设备、
+   运行时及数值/功能证据。
 
 跨部署复用时可使用外部 scnet/budget 绑定。回收后通过 scnet-app record 指定原始输出及日志，
 记录和副本保留在 .private/evidence/。见[验收与证据](references/verification_CN.md)。

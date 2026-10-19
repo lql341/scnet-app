@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 (2026-10-19)
+
+- Add a backward-compatible six-axis stack signature for system, toolchain,
+  backend, MPI, framework and SCNet platform identity.
+- Add prerequisite/conflict metadata, versioned level-A standard checks and an
+  R1 compatibility matrix reference.
+- Store normalized stack signatures and fingerprints in private evidence records.
+- Validate DCU delivery module/package names against the backend version and target.
+- Extend generated application scaffolds with stack, prerequisite and validation
+  fields and bilingual prerequisite guidance.
+
 ## 0.3.0 (2026-10-18)
 
 - Add a source-to-skill adaptation loop with bounded recorded attempts and a

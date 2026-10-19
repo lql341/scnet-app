@@ -33,6 +33,13 @@ def main():
             for link in re.findall(r"\]\(([^)]+)\)", path.read_text(encoding="utf-8")):
                 if "://" not in link and not link.startswith("#") and not (path.parent / link.split("#")[0]).exists():
                     raise ValueError("broken Markdown link: " + str(relative) + " -> " + link)
+    matrix = json.loads((ROOT / "stacks/matrix.json").read_text(encoding="utf-8"))
+    ids = [item.get("id") for item in matrix.get("signatures", [])]
+    if len(ids) != len(set(ids)) or any(not item for item in ids):
+        raise ValueError("stack matrix ids must be unique and non-empty")
+    standard = json.loads((ROOT / "standards/level-a-v1.json").read_text(encoding="utf-8"))
+    if standard.get("level") != "A" or len(standard.get("checks", [])) != 8:
+        raise ValueError("level-a-v1 must define exactly eight standard checks")
     with tempfile.TemporaryDirectory() as tmp:
         destination = Path(tmp) / "scnet-smoke"
         scnet_app.init_app("scnet-smoke", destination, "https://example.org/science", "hygon-z100")

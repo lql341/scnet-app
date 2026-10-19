@@ -37,6 +37,14 @@ class EvidenceTests(unittest.TestCase):
         data["checks"] = [{"name": "energy", "kind": "numeric", "required": True, "file": "metrics.json", "key": "energy", "ref": 1.0, "atol": 1e-6}]
         data["provenance"] = {"revision": "a" * 40, "license": "MIT"}
         data["scnet"] = {"backend": "openapi", "cluster": "test-profile", "region": "12345", "queue": "test-queue"}
+        data["stack"] = {
+            "system": {"name": "centos7.6", "glibc": "2.17"},
+            "toolchain": {"gcc": "16.2.0", "cmake": "4.4.3"},
+            "backend": {"kind": "dcu", "runtime": "dtk", "version": "26.04", "target": "hygon-z100", "arch": "gfx906"},
+            "mpi": {"vendor": "openmpi", "version": "5.0.11"},
+            "framework": {"name": "none"},
+            "platform": {"adapter": "scnet-openapi", "region": "12345", "cluster": "test-profile", "queue": "test-queue"},
+        }
         (self.root / "scripts/run.sh").write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
         (self.root / "scripts/check.py").write_text(checker, encoding="utf-8")
         self.save(data)

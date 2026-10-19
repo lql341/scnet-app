@@ -38,6 +38,18 @@ class DeliveryTests(unittest.TestCase):
     def complete_package(self):
         data = app.load_app(self.root)
         data["scnet"] = {"backend": "openapi", "cluster": "testprofile", "region": "12345", "queue": "testqueue"}
+        data["stack"] = {
+            "system": {"name": "centos7.6", "glibc": "2.17"},
+            "toolchain": {"gcc": "16.2.0", "cmake": "4.4.3"},
+            "backend": {"kind": "dcu", "runtime": "dtk", "version": "26.04", "target": "hygon-z100", "arch": "gfx906"},
+            "mpi": {"vendor": "openmpi", "version": "5.0.11"},
+            "framework": {"name": "none"},
+            "platform": {"adapter": "scnet-openapi", "region": "12345", "cluster": "testprofile", "queue": "testqueue"},
+        }
+        delivery_config = json.loads((self.root / "delivery.json").read_text())
+        delivery_config["package_name"] = "science-0.1.0-gcc16_ompi5_dtk26.04_z100.tar"
+        delivery_config["module_name"] = "science/0.1.0-dtk26.04-z100"
+        (self.root / "delivery.json").write_text(json.dumps(delivery_config), encoding="utf-8")
         data["provenance"] = {"revision": "a" * 40, "license": "MIT"}
         data["acceptance"] = "Observed energy equals independent reference 1.0."
         data["checks"] = [{"name": "energy", "kind": "numeric", "required": True,
@@ -56,12 +68,16 @@ class DeliveryTests(unittest.TestCase):
         (self.root / "scripts/run.sh").write_text("#!/bin/bash\nset -e\nruntime/app/bin/science < runtime/case/testcase/input.txt > results/output.txt\n", encoding="utf-8")
         (self.root / "scripts/check.py").write_text('import json,sys\nprint(json.dumps({"checks":{}}))\n', encoding="utf-8")
         (self.root / "app.json").write_text(json.dumps(data), encoding="utf-8")
-        for name in ("README.md", "README_CN.md", "SKILL.md", "references/validation.md", "references/validation_CN.md", "tests/README.md"):
+        for name in ("README.md", "README_CN.md", "SKILL.md", "references/validation.md",
+                     "references/validation_CN.md", "references/prerequisites.md",
+                     "references/prerequisites_CN.md", "tests/README.md"):
             (self.root / name).write_text("Tested application guidance and evidence.\n", encoding="utf-8")
         results = Path(self.tmp.name) / "collected"
         results.mkdir()
         (results / "metrics.json").write_text('{"energy":1.0}', encoding="utf-8")
-        (results / "runtime.json").write_text('{"target":"hygon-z100","device_used":true,"device":"DCU observed","runtime":"DTK observed"}', encoding="utf-8")
+        runtime = {"target": "hygon-z100", "device_used": True, "device": "DCU observed", "runtime": "DTK observed",
+                   "stack_signature": app.stack_signature(data, app.resolve_binding(data))}
+        (results / "runtime.json").write_text(json.dumps(runtime), encoding="utf-8")
         return data, results
 
     def test_success_builds_skill_tar_and_manifest_without_private_evidence(self):
@@ -95,6 +111,29 @@ class DeliveryTests(unittest.TestCase):
         status = self.status()
         self.assertFalse(status["ready_to_build"])
         self.assertIn("scheduler", " ".join(status["blocked_by"]))
+        self.assertIn("runtime/device", " ".join(status["blocked_by"]))
+
+    def test_stack_identity_must_match_module_and_tar_names(self):
+        data, _ = self.complete_package()
+        path = self.root / "delivery.json"
+        config = json.loads(path.read_text())
+        config["module_name"] = "science/0.1.0-dtk26.10-z100"
+        path.write_text(json.dumps(config))
+        self.assertIn("module_name does not include backend version", " ".join(self.status()["blocked_by"]))
+        config["module_name"] = "science/0.1.0-dtk26.04-z100"
+        config["package_name"] = "science-0.1.0-gcc16_ompi5_dtk26.10_z100.tar"
+        path.write_text(json.dumps(config))
+        self.assertIn("package_name does not include backend version", " ".join(self.status()["blocked_by"]))
+
+    def test_runtime_stack_signature_must_match_accepted_binding(self):
+        data, results = self.complete_package()
+        runtime = json.loads((results / "runtime.json").read_text())
+        runtime["stack_signature"]["backend"]["version"] = "26.10"
+        (results / "runtime.json").write_text(json.dumps(runtime), encoding="utf-8")
+        with patch.object(evidence, "check_job", return_value={"status": "passed", "job_id": "job1"}):
+            app.record(self.root, results, "bad-stack", ["metrics.json", "runtime.json"],
+                       job_state="succeeded", job_id="job1", remote="/scratch/bad-stack", hpc=["python", "fake"])
+        status = self.status()
         self.assertIn("runtime/device", " ".join(status["blocked_by"]))
 
     def test_official_package_name_rules(self):

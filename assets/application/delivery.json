@@ -1,6 +1,8 @@
 {
   "standard_level": "A",
   "package_name": "__PACKAGE_X__-0.1.0-__PACKAGE_Z__.tar",
+  "module_name": "__PACKAGE_X__/0.1.0-unconfigured",
   "max_attempts": 5,
-  "runtime_evidence": "runtime.json"
+  "runtime_evidence": "runtime.json",
+  "criterion_version": "level-a-v1"
 }

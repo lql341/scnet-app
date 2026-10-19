@@ -14,7 +14,8 @@ package. Preserve each failed attempt and stop at the authorized retry limit.
 Pin provenance, declare authorized per-job budget caps and select the actual SCNet
 binding. Region 0/unconfigured defaults do not identify an enabled deployment.
 
-Read `app.json` for the SCNet target, budget, environment, artifact list and hooks.
+Read `app.json` for the SCNet target, six-axis stack, prerequisites, budget,
+environment, artifact list and hooks.
 Use scnet-hpc for credentials, live resources, uploads, submit, wait, logs and cancel.
 Do not create a second OpenAPI client or credential store. Follow the English and
 Chinese README for installation/prerequisites and use the scnet-app planner when
@@ -35,7 +36,7 @@ directory references. A waiting timeout does not cancel a job. Keep all expected
 rank outcomes when adding parallel execution. Publish sanitized compatibility
 reports; keep credentials, account paths, job IDs and recovered/private data private.
 
-Read `references/validation.md` to record what was actually verified. Default
+Read `references/prerequisites.md` and `references/validation.md` to record what was actually verified. Default
 documentation is English; respond in the user's language.
 For collected artifacts, follow references/verification.md and scnet-app record.
 Keep raw records private; distinguish local correctness, platform job checking and

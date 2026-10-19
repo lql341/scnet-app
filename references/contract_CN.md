@@ -17,6 +17,9 @@
 | scnet | openapi、已有集群 profile 名、明确区域 ID 和队列 |
 | resources | 单节点、CPU 总数、每节点 DCU 数、正数 HH:MM:SS 时限 |
 | environment | 站点 module 及可选的已存在远端绝对 modulefiles 目录，不猜通用 DTK 版本 |
+| stack（v1 扩展） | system/toolchain/backend/MPI/framework/platform 的完整栈签名；新应用部署前必填 |
+| prerequisites（v1 扩展） | 必需 module、冲突关系和获取说明；运行时/ABI 依赖显式声明 |
+| validation（v1 扩展） | 判据版本、必过标准套件和可选设备证据模式 |
 | run | 在计算节点执行的相对 Bash 钩子 |
 | check | 回收后在本地执行的相对 Python 检查器，参数为结果目录 |
 | files | 除 app.json/run/check 外要上传的显式相对文件，保留目录结构 |
@@ -25,13 +28,17 @@
 | budget（v1 可选扩展） | 单作业 max_nodes、max_cpus、max_dcus_per_node、max_walltime，可部署计划必需 |
 | checks（v1 可选扩展） | 数值/hook 必需项及可选 holdout 元数据，record 必需 |
 
-字段格式、外部绑定、私有记录及 v0.1 升级方式见[验收与证据](verification_CN.md)。
+前置条件见[运行前置条件](prerequisites_CN.md)；字段格式、外部绑定、私有记录及 v0.1 升级方式见[验收与证据](verification_CN.md)。
 schema_version 保持 1，元 skill 版本为 0.3.0。缺新字段仍能读取旧包，
 但部署信息不足不给 submit，缺 checks 不执行 record。
 
 未知字段会被拒绝，凭证/接口不能成为第二套配置通道。凭证和实时资源由 scnet-hpc
 管理。产物路径不能越过应用根目录，缺文件或逃逸软链接会失败。
 目录/大型依赖应打包为明确归档并补应用自己的暂存/构建步骤，尚无递归依赖收集。
+
+新应用应使用六轴栈签名。platform 轴进入证据但不改变二进制 ABI 命名；
+backend 版本和产品机型会改变命名。已配置的 DCU 应用必须在
+`delivery.json.module_name` 和 `delivery.json.package_name` 中同时体现后端版本和目标机型。
 
 ## 钩子职责
 

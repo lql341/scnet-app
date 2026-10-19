@@ -19,6 +19,9 @@ binding, Slurm allocation and runtime packaging; use the
 | scnet | openapi backend, existing cluster profile name, explicit region ID and queue |
 | resources | One node, total CPU count, per-node DCUs and positive HH:MM:SS walltime |
 | environment | Site modules and optional existing absolute remote modulefiles directory; no guessed universal DTK version |
+| stack (v1 extension) | Full system/toolchain/backend/MPI/framework/platform signature; required for new deployable applications |
+| prerequisites (v1 extension) | Required modules, conflicts and acquisition guidance; runtime/ABI dependencies stay explicit |
+| validation (v1 extension) | Criterion version and required standard suites, with optional device-evidence patterns |
 | run | Relative Bash hook executed on the allocated compute node |
 | check | Relative Python hook executed locally after result collection; takes a results directory argument |
 | files | Explicit relative files staged in addition to app.json/run/check; preserve directory structure |
@@ -27,7 +30,7 @@ binding, Slurm allocation and runtime packaging; use the
 | budget (optional v1 extension) | Per-job max_nodes, max_cpus, max_dcus_per_node and max_walltime; required for a deployable plan |
 | checks (optional v1 extension) | Required numeric/hook verdicts and optional holdout metadata; required for record |
 
-Read [acceptance and evidence](verification.md) for formats, external binding,
+Read [prerequisites](prerequisites.md) and [acceptance and evidence](verification.md) for formats, external binding,
 private records and v0.1 upgrades. Schema version stays 1; the CLI release is 0.3.0.
 Missing new fields do not break loading; deployment facts and checks gate submit
 and record respectively.
@@ -37,6 +40,11 @@ configuration channel. Use scnet-hpc for credentials and live resources. Artifac
 paths cannot escape the application root; missing files and escaping symlinks fail.
 Package directories or large dependencies as explicit archives and add an application
 staging/build procedure; recursive dependency collection is not implemented.
+
+New applications should use the six-axis stack signature. The platform axis is
+included in evidence but does not change binary ABI naming; the backend version
+and product target do. A configured DCU application must include those values in
+both `delivery.json.module_name` and `delivery.json.package_name`.
 
 ## Hooks
 

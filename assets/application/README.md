@@ -33,16 +33,18 @@ reference is [scnet-hashcat](https://github.com/lql341/scnet-hashcat); use the
 new application's own scientific acceptance criterion.
 
 1. Inspect the upstream license, build system, dependencies and representative input.
-2. Edit app.json: SCNet region/queue, requested resources, modules, explicit file
-   list, pinned provenance (revision/license), authorized per-job budget, acceptance
-   and structured numeric/hook checks. New region 0/unconfigured values are blocked.
+2. Edit app.json: SCNet region/queue, complete six-axis stack, prerequisites,
+   requested resources, modules, explicit file list, pinned provenance
+   (revision/license), authorized per-job budget, acceptance and structured
+   numeric/hook checks. New region 0/unconfigured values are blocked.
 3. Implement scripts/run.sh (compute node) and scripts/check.py (local collected
    results). Package all required application code/data in the explicit file list.
 4. Use scnet-app validate/plan, then scnet-hpc read-only preflight and submit preview.
    The planner blocks a submit command while stock hooks/criteria remain.
 5. Run one bounded SCNet case after implementation. Download explicit result/log
    files, check scheduler accounting and exit status, then run the local checker.
-6. Record device/runtime and numerical/functional evidence in references/validation.md.
+6. Record stack, device/runtime and numerical/functional evidence in
+   references/prerequisites.md and references/validation.md.
 
 Use an external scnet/budget binding when sharing this application across deployments.
 After collection, use scnet-app record with explicit raw result/log artifacts;

@@ -19,6 +19,22 @@ import scnet_delivery as delivery
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 DEFAULT_ACCEPTANCE = "Define an application-specific reference result and numerical/functional acceptance criteria before running."
+DEFAULT_STACK = {
+    "system": {"name": "unconfigured", "glibc": "unconfigured"},
+    "toolchain": {"gcc": "unconfigured", "cmake": "unconfigured"},
+    "backend": {"kind": "dcu", "runtime": "unconfigured", "version": "unconfigured",
+                "target": "unconfigured", "arch": "unconfigured"},
+    "mpi": {"vendor": "unconfigured", "version": "unconfigured"},
+    "framework": {"name": "none"},
+    "platform": {"adapter": "scnet-openapi", "region": "0", "cluster": "unconfigured", "queue": "unconfigured"},
+}
+
+
+def default_stack(target):
+    value = json.loads(json.dumps(DEFAULT_STACK))
+    value["backend"]["kind"] = "dcu" if target == "hygon-z100" else "cpu"
+    value["backend"]["target"] = target if target == "hygon-c86" else "unconfigured"
+    return value
 
 
 class AppError(ValueError):
@@ -87,6 +103,35 @@ def local_file(root, relative):
     return resolved
 
 
+def stack_signature(data, binding=None):
+    stack = data.get("stack")
+    if not stack:
+        return None
+    result = json.loads(json.dumps(stack))
+    if binding:
+        result["platform"] = {
+            **result.get("platform", {}),
+            "adapter": "scnet-" + binding["scnet"]["backend"],
+            "region": binding["scnet"]["region"],
+            "cluster": binding["scnet"]["cluster"],
+            "queue": binding["scnet"]["queue"],
+        }
+    return result
+
+
+def stack_is_configured(stack):
+    if not stack:
+        return True
+    values = []
+    for axis in ("system", "toolchain", "backend", "mpi", "framework", "platform"):
+        values.extend(stack[axis].values())
+    return all(value not in ("", "0", "unconfigured") for value in values)
+
+
+def target_short_name(target):
+    return {"hygon-z100": "z100", "hygon-c86": "c86"}.get(target, target)
+
+
 def load_app(root):
     root = Path(root).resolve()
     data = json.loads((root / "app.json").read_text(encoding="utf-8"))
@@ -105,6 +150,14 @@ def load_app(root):
         raise AppError("walltime must be positive")
     if data["environment"]["modulefiles"]:
         remote_path(data["environment"]["modulefiles"])
+    if data.get("stack"):
+        stack = data["stack"]
+        if stack["backend"]["target"] not in ("unconfigured", data["target"]):
+            raise AppError("stack.backend.target must match target")
+        if data["target"] == "hygon-z100" and stack["backend"]["kind"] not in ("dcu", "unconfigured"):
+            raise AppError("Hygon Z100 target requires a DCU backend")
+        if data["target"] == "hygon-c86" and stack["backend"]["kind"] not in ("cpu", "unconfigured"):
+            raise AppError("Hygon C86 target requires a CPU backend")
     evidence.validate_checks(data.get("checks", []))
     for relative in [data["run"], data["check"], *data["files"]]:
         local_file(root, relative)
@@ -131,6 +184,9 @@ def init_app(name, output, upstream, target):
         "scnet": {"backend": "openapi", "cluster": "unconfigured", "region": "0", "queue": "unconfigured"},
         "resources": {"nodes": 1, "cpus": 8, "dcus_per_node": 1 if target == "hygon-z100" else 0, "walltime": "00:03:00"},
         "environment": {"modules": [], "modulefiles": ""},
+        "stack": default_stack(target),
+        "prerequisites": {"modules": [], "conflicts": [], "obtain": "Complete references/prerequisites_CN.md before deployment."},
+        "validation": {"criterion_version": "level-a-v1", "standard_suites": ["level-a"]},
         "run": "scripts/run.sh", "check": "scripts/check.py", "files": [],
         "acceptance": DEFAULT_ACCEPTANCE,
         "provenance": {"revision": "", "license": ""},
@@ -205,6 +261,11 @@ def deployment_blocks(data, binding):
     reasons = []
     if binding["scnet"]["region"] == "0" or any(binding["scnet"][key] == "unconfigured" for key in ("cluster", "queue")):
         reasons.append("Select an enabled SCNet cluster/region/queue in app.json or --binding.")
+    stack = stack_signature(data, binding)
+    if stack and not stack_is_configured(stack):
+        reasons.append("Declare a complete six-axis stack signature before deployment.")
+    elif stack and stack["platform"]["adapter"] != "scnet-" + binding["scnet"]["backend"]:
+        reasons.append("stack.platform.adapter must match the selected SCNet backend.")
     source = data.get("provenance", {})
     if not re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", source.get("revision", "")) or not source.get("license", "").strip():
         reasons.append("Record the exact upstream commit/archive SHA256 and license in provenance.")
@@ -250,6 +311,7 @@ def plan(root, hpc, remote, binding_path=None):
     status = evidence.verification(root, data, binding)
     return {
         "application": data["name"], "target": data["target"], **status,
+        "stack_signature": stack_signature(data, binding),
         "binding": binding,
         "implementation_ready": ready,
         "blocked_by": blocked,

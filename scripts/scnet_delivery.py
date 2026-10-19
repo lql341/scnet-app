@@ -37,7 +37,9 @@ def _files(root, directory):
 def _configuration(root):
     path = _file(root, "delivery.json")
     data = evidence.read_object(path)
-    if set(data) != {"standard_level", "package_name", "max_attempts", "runtime_evidence"}:
+    required = {"standard_level", "package_name", "max_attempts", "runtime_evidence"}
+    optional = {"module_name", "criterion_version"}
+    if not required.issubset(data) or set(data) - required - optional:
         raise ValueError("delivery.json requires standard_level, package_name, max_attempts and runtime_evidence")
     if data["standard_level"] != "A":
         raise ValueError("this success gate currently implements only SCNet packaging level A")
@@ -50,7 +52,40 @@ def _configuration(root):
     runtime = data["runtime_evidence"]
     if not isinstance(runtime, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._/-]{0,127}", runtime) or ".." in Path(runtime).parts:
         raise ValueError("runtime_evidence must be a relative result file")
+    if "module_name" in data and (
+        not isinstance(data["module_name"], str)
+        or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,31}/[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}", data["module_name"])
+    ):
+        raise ValueError("module_name must be a valid module path")
+    if "criterion_version" in data and (
+        not isinstance(data["criterion_version"], str) or not data["criterion_version"].strip()
+    ):
+        raise ValueError("criterion_version must be a non-empty string")
     return data
+
+
+def _validate_stack_identity(app, config):
+    stack = app.get("stack")
+    if not stack or not all(value not in ("", "0", "unconfigured")
+                            for axis in ("system", "toolchain", "backend", "mpi", "framework", "platform")
+                            for value in stack[axis].values()):
+        return []
+    backend = stack["backend"]
+    target = app["target"][len("hygon-"):] if app["target"].startswith("hygon-") else app["target"]
+    version = backend["version"]
+    runtime = backend["runtime"]
+    module_name = config.get("module_name", "")
+    package_name = config["package_name"]
+    if backend["kind"] == "dcu":
+        expected_module = f"{runtime}{version}-{target}"
+        expected_tar = f"{runtime}{version}_{target}"
+        failures = []
+        if expected_module not in module_name:
+            failures.append("module_name does not include backend version and target")
+        if expected_tar not in package_name:
+            failures.append("package_name does not include backend version and target")
+        return failures
+    return []
 
 
 def attempt_blocks(root):
@@ -66,10 +101,16 @@ def gate(root, app, binding, verification, implementation_ready, deployment_bloc
     root = Path(root).resolve()
     config = _configuration(root)
     failures = []
+    failures.extend(_validate_stack_identity(app, config))
+    declared_criterion = app.get("validation", {}).get("criterion_version")
+    if config.get("criterion_version") and declared_criterion and config["criterion_version"] != declared_criterion:
+        failures.append("delivery criterion_version does not match app validation")
     if not implementation_ready:
         failures.append("implement run/check hooks and independent acceptance checks")
     failures.extend(deployment_blocks)
-    required_docs = ("SKILL.md", "README.md", "README_CN.md", "references/validation.md", "references/validation_CN.md", "tests/README.md")
+    required_docs = ("SKILL.md", "README.md", "README_CN.md", "references/validation.md",
+                     "references/validation_CN.md", "references/prerequisites.md",
+                     "references/prerequisites_CN.md", "tests/README.md")
     for name in required_docs:
         try:
             text = _file(root, name).read_text(encoding="utf-8")
@@ -116,12 +157,17 @@ def gate(root, app, binding, verification, implementation_ready, deployment_bloc
             observed = evidence.read_object(runtime_path)
             if observed.get("target") != app["target"] or observed.get("device_used") is not True or not observed.get("runtime") or not observed.get("device"):
                 raise ValueError("runtime evidence lacks target, actual device or runtime")
+            expected_stack = evidence.stack_signature(app, binding)
+            if expected_stack and observed.get("stack_signature") != expected_stack:
+                raise ValueError("runtime evidence stack signature does not match the accepted job")
         except (OSError, ValueError, KeyError, TypeError):
             failures.append("record target-matched runtime/device evidence from the accepted job")
     else:
         failures.append("record a completed test case")
     remaining = max(0, config["max_attempts"] - len(attempts))
     return {"application": app["name"], "standard_level": "A", "package_name": config["package_name"],
+            "module_name": config.get("module_name"), "runtime_evidence": config["runtime_evidence"],
+            "stack_signature": evidence.stack_signature(app, binding),
             "ready_to_build": not failures, "blocked_by": failures, "attempts_recorded": len(attempts),
             "attempts_remaining": remaining, "retry_allowed": bool(failures and remaining),
             "verification": verification["verification"],
@@ -158,7 +204,10 @@ def build(root, app, gate_result, output):
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
     manifest = {"application": app["name"], "standard_level": gate_result["standard_level"],
-                "runtime_tar": package.name, "skill_directory": skill.name,
+                "runtime_tar": package.name, "module_name": gate_result.get("module_name"),
+                "stack_signature": gate_result.get("stack_signature"),
+                "runtime_evidence": gate_result.get("runtime_evidence"),
+                "skill_directory": skill.name,
                 "files": {path.relative_to(output).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
                           for path in sorted(output.rglob("*")) if path.is_file()}}
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

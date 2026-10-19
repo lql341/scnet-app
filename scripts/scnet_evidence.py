@@ -49,6 +49,21 @@ def fingerprint(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, allow_nan=False).encode("utf-8")).hexdigest()
 
 
+def stack_signature(data, binding):
+    stack = data.get("stack")
+    if not stack:
+        return None
+    result = json.loads(json.dumps(stack))
+    result["platform"] = {
+        **result.get("platform", {}),
+        "adapter": "scnet-" + binding["scnet"]["backend"],
+        "region": binding["scnet"]["region"],
+        "cluster": binding["scnet"]["cluster"],
+        "queue": binding["scnet"]["queue"],
+    }
+    return result
+
+
 def source_hashes(root, data):
     names = sorted(set(["app.json", data["run"], data["check"], *data["files"]]))
     if (Path(root) / "delivery.json").is_file():
@@ -196,10 +211,15 @@ def record(root, data, binding, results, run_id, artifacts, job_state="unknown",
     rows = evaluate(data["checks"], numeric, hook, hook_exit == 0)
     passed = unchanged and hook_exit == 0 and all(row["passed"] for row in rows if row["required"])
     job = check_job(job_command, job_id, remote, data, binding) if job_command else {"status": "not_checked"}
-    entry = {"evidence_version": 1, "run_id": run_id,
+    signature = stack_signature(data, binding)
+    validation = data.get("validation", {})
+    entry = {"evidence_version": 2, "run_id": run_id,
              "recorder_version": (Path(__file__).resolve().parent.parent / "VERSION").read_text(encoding="utf-8").strip(),
              "recorded_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
              "source_hashes": before_source, "binding": binding, "result_hashes": before, "missing_check_files": missing,
+             "stack_signature": signature,
+             "stack_fingerprint": fingerprint(signature) if signature else None,
+             "criterion_version": validation.get("criterion_version"),
              "declared_job_state": job_state, "source": "scnet_job_checked" if job["status"] == "passed" else "self_reported",
              "scheduler": job, "checker_exit": hook_exit, "checker_error": error,
              "inputs_unchanged": unchanged, "hook_result": hook, "checks": rows,
@@ -228,7 +248,7 @@ def verification(root, data, binding):
             path.resolve().relative_to(root)
             entry = read_object(path)
             digest = entry.pop("record_sha256")
-            if entry.get("evidence_version") != 1 or fingerprint(entry) != digest:
+            if entry.get("evidence_version") not in (1, 2) or fingerprint(entry) != digest:
                 raise ValueError("Record checksum mismatch")
             if entry["source_hashes"] != current or entry["binding"] != binding:
                 stale += 1

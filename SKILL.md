@@ -47,10 +47,12 @@ from a scaffold, a build alone or a self-reported device field.
    and memory. Read references/hygon-z100.md for Hygon Z100 DCU/DTK; start with a
    minimal supported path, such as FP32, then test other required capabilities.
 4. Implement the Bash run hook and local Python checker. Define acceptance and
-   structured numeric/hook checks; pin upstream revision/license and declare an
-   explicit binding and per-job budget. Read references/verification.md. Preserve application
-   semantics; keep install/build, device/runtime, correctness and performance
-   evidence distinct. Optional probes in assets/probes/ prove only their own scope.
+   structured numeric/hook checks; pin upstream revision/license, complete the
+   six-axis stack signature and declare prerequisites, conflicts, binding and a
+   per-job budget. Read references/prerequisites.md and references/verification.md.
+   Preserve application semantics; keep install/build, device/runtime, correctness
+   and performance evidence distinct. Optional probes in assets/probes/ prove only
+   their own scope.
 5. Validate packaging and generate a local SCNet plan. Use scnet-hpc doctor and
    resource-summary, inspect actual limits/permissions and review submit preview.
    Use existing user authorization and the requested resource/time budget; no
@@ -71,15 +73,16 @@ from a scaffold, a build alone or a self-reported device field.
 ## Standard contract
 
 Each generated application uses app.json plus scripts/run.sh, scripts/check.py,
-SKILL.md, agents/, bilingual README, VERSION, CHANGELOG, tests and validation notes.
+SKILL.md, agents/, bilingual README, VERSION, CHANGELOG, tests, prerequisites,
+validation notes and a six-axis stack signature.
 Read [references/contract.md](references/contract.md) for fields and evidence.
 Follow [cluster integration](references/cluster-integration.md) for resource,
 scheduler and runtime packaging requirements and the
 [scnet-hashcat reference](references/hashcat-reference.md) for concrete examples.
 The stock hooks fail; submit=null until hooks/acceptance, explicit binding, pinned
-provenance and an authorized per-job budget are ready and in range. Structured
-checks are required for record. Existing v1 packages remain readable. These gates
-do not certify correctness or enforce cumulative spend.
+provenance, a configured stack and an authorized per-job budget are ready and in
+range. Structured checks are required for record. Existing v1 packages remain
+readable. These gates do not certify correctness or enforce cumulative spend.
 
 Use one fixed target/region per plan, a new remote directory per run, explicit
 artifact lists and quoted arguments. Submit once. Wait timeout leaves a job active;

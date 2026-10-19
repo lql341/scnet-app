@@ -1,0 +1,14 @@
+{
+  "version": "level-a-v1",
+  "level": "A",
+  "checks": [
+    {"id": "entrypoint", "description": "The declared run hook starts and writes results."},
+    {"id": "exit_status", "description": "Application failure propagates as a nonzero workload exit."},
+    {"id": "bad_input", "description": "Missing or malformed input fails with a diagnostic message."},
+    {"id": "environment", "description": "The packaged env.sh works independently from the login shell."},
+    {"id": "device_evidence", "description": "The application emits a grep-able device execution line when accelerator execution is declared."},
+    {"id": "offline", "description": "The case does not require compute-node network access."},
+    {"id": "relocatable", "description": "Post-install path substitution works at a fresh absolute package path."},
+    {"id": "idempotent", "description": "Repeated post-install processing leaves the package usable and unchanged in meaning."}
+  ]
+}
