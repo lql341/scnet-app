@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 
 import scnet_evidence as evidence
 import scnet_delivery as delivery
+import scnet_level_a as level_a
 
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
@@ -584,9 +585,22 @@ def main(argv=None):
     init.add_argument("--output", type=Path, required=True)
     init.add_argument("--upstream", required=True)
     init.add_argument("--target", choices=["hygon-z100", "hygon-c86"], default="hygon-z100")
-    for command in ("validate", "plan", "doctor", "record", "gate", "build",
+    for command in ("validate", "plan", "doctor", "record", "gate", "build", "level-a", "quick-build",
                     "intake", "run", "status", "resume", "explain-failure"):
         child = sub.add_parser(command)
+        if command in ("level-a", "quick-build"):
+            if command == "level-a":
+                child.add_argument("application", type=Path)
+                child.add_argument("--output", type=Path, help="write structured level-A evidence JSON")
+                continue
+            child.add_argument("source", type=Path)
+            child.add_argument("--output", type=Path, required=True)
+            child.add_argument("--name", required=True)
+            child.add_argument("--upstream", required=True)
+            child.add_argument("--input", default="hello\n")
+            child.add_argument("--expected", default="hello\n")
+            child.add_argument("--binary")
+            continue
         child.add_argument("application", type=Path)
         child.add_argument("--binding", type=Path, help="external JSON with explicit scnet and budget objects")
         if command != "validate":
@@ -607,6 +621,15 @@ def main(argv=None):
     try:
         if args.op == "init":
             emit(init_app(args.name, args.output, args.upstream, args.target))
+        elif args.op == "level-a":
+            result = level_a.run(args.application, args.output)
+            emit(result)
+            return 0 if result["passed"] else 1
+        elif args.op == "quick-build":
+            from scnet_quickbuild import build
+            emit(build(args.source, args.output, args.name, args.upstream,
+                       args.input, args.expected, args.binary))
+            return 0
         elif args.op == "intake":
             emit(workflow_intake(args.application))
         elif args.op == "run":
