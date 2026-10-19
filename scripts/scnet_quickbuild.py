@@ -66,7 +66,8 @@ def find_binary(root: Path, requested: Optional[str]) -> Path:
 
 def _write(path: Path, text: str, executable: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8", newline="\n")
+    with path.open("w", encoding="utf-8", newline="\n") as stream:
+        stream.write(text)
     if executable:
         path.chmod(path.stat().st_mode | 0o111)
 

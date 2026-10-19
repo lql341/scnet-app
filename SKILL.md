@@ -102,6 +102,23 @@ python3 scripts/scnet_app.py gate ../scnet-myapp --binding /private/binding.json
 python3 scripts/scnet_app.py build ../scnet-myapp --binding /private/binding.json --output /fresh/delivery
 ```
 
+For a small CPU source tree, use the first vertical slice before allocating
+compute:
+
+```bash
+python3 scripts/scnet_app.py quick-build ./source --output ./scnet-myapp --name scnet-myapp --upstream https://example.org/project
+python3 scripts/scnet_app.py level-a ./scnet-myapp --output ./level-a.json
+python3 scripts/scnet_app.py intake ./scnet-myapp
+python3 scripts/scnet_app.py run ./scnet-myapp
+```
+
+The quick builder detects CMake or Make, builds in a temporary directory, stages
+one executable and creates the smoke case, checker, runtime tar and provenance
+manifest. It is deliberately CPU-only and does not infer dependencies or target
+runtime support. The level-A runner checks package behavior locally; it is not a
+replacement for SCNet scheduler or device evidence. Workflow state and immutable
+attempts are stored under `.private/workflow/`.
+
 Replace example paths/source before use. init/validate are offline; plan additionally
 needs a local scnet-hpc >=0.6.13 installation but runs no commands. doctor is read-only
 and contacts SCNet. This CLI never uploads, submits, builds or installs remotely.

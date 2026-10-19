@@ -72,6 +72,23 @@ python3 scripts/scnet_app.py validate ../scnet-myapp
 python3 scripts/scnet_app.py plan ../scnet-myapp --binding "/private/binding.json" --scnet-hpc "/absolute/scnet-hpc" --remote-dir "/absolute/remote/fresh-run"
 ```
 
+For a small CMake or Make CPU source tree, the first vertical-slice workflow can
+build a clean application skill and local runtime package without a cluster:
+
+```bash
+python3 scripts/scnet_app.py quick-build ./source --output ./scnet-myapp \
+  --name scnet-myapp --upstream https://example.org/project
+python3 scripts/scnet_app.py level-a ./scnet-myapp --output ./level-a.json
+python3 scripts/scnet_app.py intake ./scnet-myapp
+python3 scripts/scnet_app.py run ./scnet-myapp
+```
+
+`quick-build` supports conservative CMake/Make detection only; it does not guess
+dependencies or claim compute-node compatibility. `level-a` executes the eight
+local package checks and keeps accelerator evidence declarative. The workflow
+commands persist resumable state under `.private/workflow/` and preserve failed
+attempts.
+
 The result is a scaffold, not a ported application. Implement the run/check hooks,
 human-readable acceptance and structured checks. Pin the upstream commit/archive
 hash and license in provenance. New scaffolds have no implicit cluster selection:
