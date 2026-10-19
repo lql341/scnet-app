@@ -60,6 +60,19 @@ class IntakeTests(unittest.TestCase):
         self.assertEqual(result["classification"], "installed")
         self.assertEqual(json.loads(output.read_text())["intake_version"], 1)
 
+    def test_allwmake_source_with_bin_and_lib_is_not_misclassified_as_installed(self):
+        foam = Path(self.tmp.name) / "openfoam"
+        (foam / "bin").mkdir(parents=True)
+        (foam / "lib").mkdir()
+        (foam / "Allwmake").write_text("#!/bin/sh\n", encoding="utf-8")
+        (foam / "LICENSE.md").write_text("GPL-3.0-or-later\n", encoding="utf-8")
+        result = scnet_intake.inspect(foam)
+        self.assertEqual(result["classification"], "source")
+        self.assertIn("Allwmake", result["build_markers"])
+        self.assertEqual(result["license_files"], ["LICENSE.md"])
+        self.assertEqual(result["adapter_hint"], "openfoam-allwmake")
+        self.assertIn("ThirdParty", result["next"])
+
 
 if __name__ == "__main__":
     unittest.main()

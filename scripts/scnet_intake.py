@@ -14,9 +14,10 @@ import zipfile
 
 BUILD_MARKERS = (
     "CMakeLists.txt", "Makefile", "makefile", "configure",
-    "pyproject.toml", "setup.py", "go.mod", "Cargo.toml",
+    "Allwmake", "Allwmake-modules", "pyproject.toml", "setup.py",
+    "go.mod", "Cargo.toml",
 )
-LICENSE_MARKERS = ("LICENSE", "LICENSE.txt", "COPYING", "NOTICE")
+LICENSE_MARKERS = ("LICENSE", "LICENSE.txt", "LICENSE.md", "COPYING", "NOTICE")
 ARCHIVE_SUFFIXES = (".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz2", ".tar.xz", ".txz", ".zip")
 
 
@@ -113,6 +114,18 @@ def inspect(source: str | Path, output: str | Path | None = None) -> dict:
         raise ValueError("input must be a directory or supported archive")
     kind, reason = _classify(root)
     files = [path for path in root.rglob("*") if path.is_file() and not path.is_symlink()]
+    markers = [marker for marker in BUILD_MARKERS if (root / marker).is_file()]
+    adapter = "openfoam-allwmake" if "Allwmake" in markers else (
+        "cmake-or-make" if kind == "source" else None
+    )
+    next_step = {
+        "source": "run quick-build or a source-specific adapter",
+        "installed": "inspect bin/lib layout and author an installation-backed skill",
+        "skill": "validate the existing skill and review its evidence",
+        "unknown": "request build instructions or a representative executable",
+    }[kind]
+    if adapter == "openfoam-allwmake":
+        next_step = "use the OpenFOAM Allwmake adapter; ThirdParty and site toolchain must be resolved first"
     result = {
         "intake_version": 1,
         "input": str(source),
@@ -122,14 +135,10 @@ def inspect(source: str | Path, output: str | Path | None = None) -> dict:
         "classification_reason": reason,
         "file_count": len(files),
         "source_sha256": _hash_tree(root),
-        "build_markers": [marker for marker in BUILD_MARKERS if (root / marker).is_file()],
+        "build_markers": markers,
+        "adapter_hint": adapter,
         "license_files": [name for name in LICENSE_MARKERS if (root / name).is_file()],
-        "next": {
-            "source": "run quick-build or a source-specific adapter",
-            "installed": "inspect bin/lib layout and author an installation-backed skill",
-            "skill": "validate the existing skill and review its evidence",
-            "unknown": "request build instructions or a representative executable",
-        }[kind],
+        "next": next_step,
     }
     if output is not None:
         destination = Path(output).expanduser().resolve()
