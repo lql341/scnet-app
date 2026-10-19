@@ -153,4 +153,5 @@ dependency stack are not dependencies of scnet-app. References were reviewed at
 commit `d38150de76b45a0992bcfe175957d08004b7319a`:
 [GateService](https://github.com/huawei-noah/noah-research/blob/d38150de76b45a0992bcfe175957d08004b7319a/ScienceFlow/scienceflow/gates/service.py),
 [artifact evidence](https://github.com/huawei-noah/noah-research/blob/d38150de76b45a0992bcfe175957d08004b7319a/ScienceFlow/scienceflow/solver/lnr/global_merge/candidate_evidence.py).
-The operational reference remains [scnet-hashcat](hashcat-reference.md).
+The current operational mapping is [scnet-hashcat](hashcat-reference.md); its
+benchmark status remains provisional under the reference-application rubric.

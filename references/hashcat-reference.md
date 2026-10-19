@@ -2,8 +2,10 @@
 
 English | [中文](hashcat-reference_CN.md)
 
-[scnet-hashcat](https://github.com/lql341/scnet-hashcat) is the operational benchmark
-for future SCNet application skills. The links below pin reviewed commit
+[scnet-hashcat](https://github.com/lql341/scnet-hashcat) is the current operational
+candidate for future SCNet application skills, not a permanent scientific benchmark.
+Use the [reference application rubric](../roadmap/reference-application-rubric.md)
+before promoting any candidate. The links below pin reviewed commit
 `655ff24480c9ac6f01c7face01b7b9f91fa4d509`; review changes before updating the reference.
 Its domain is authorized offline password recovery. Reuse its engineering patterns
 with the new application's own inputs, semantics and correctness criterion.

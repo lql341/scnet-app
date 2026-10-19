@@ -29,7 +29,7 @@
 | checks（v1 可选扩展） | 数值/hook 必需项及可选 holdout 元数据，record 必需 |
 
 前置条件见[运行前置条件](prerequisites_CN.md)；字段格式、外部绑定、私有记录及 v0.1 升级方式见[验收与证据](verification_CN.md)。
-schema_version 保持 1，元 skill 版本为 0.3.0。缺新字段仍能读取旧包，
+schema_version 保持 1，元 skill 版本为 0.4.1。缺新字段仍能读取旧包，
 但部署信息不足不给 submit，缺 checks 不执行 record。
 
 未知字段会被拒绝，凭证/接口不能成为第二套配置通道。凭证和实时资源由 scnet-hpc

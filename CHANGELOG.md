@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.1 (2026-10-19)
+
+- Add a workflow-first production roadmap for turning source or installations
+  into validated skill repositories and runtime packages.
+- Make reference applications provisional and add a rubric for promoting one
+  to benchmark status.
+- Add mutable-method governance for scientific DCU porting guidance.
+- Add an optional ScienceFlow contrib boundary with upstream attribution,
+  MIT-license text and dependency/re-distribution limits.
+
 ## 0.4.0 (2026-10-19)
 
 - Add a backward-compatible six-axis stack signature for system, toolchain,

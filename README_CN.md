@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-版本：0.4.0
+版本：0.4.1
 
 面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
 用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，
@@ -11,9 +11,9 @@
 应用保留自己的科学逻辑及正确性检查。
 **海光（Hygon）Z100 DCU / DTK** 等硬件和运行时适配是集成流程中的一项能力。
 
-[scnet-hashcat](https://github.com/lql341/scnet-hashcat) 是运行行为、打包和验证证据的标杆应用。
-[标杆对照](references/hashcat-reference_CN.md) 说明可复用做法与实现差异；
-它不是本工具生成的 v1 应用。
+`scnet-hashcat` 当前只是运行行为、打包和验证证据的候选参考，不是永久科学标杆。
+应用候选需按[参考应用评选规则](roadmap/reference-application-rubric.md)比较，
+总体计划见[生产路线](roadmap/README.md)。
 
 ## 一句话安装
 
@@ -35,7 +35,7 @@ python3 scripts/scnet_app.py --help
 
 ## 一句话让 agent 适配应用
 
-> 使用 `$scnet-app` 将我提供的科学计算应用接入 SCNet 算力：明确区域、队列和资源预算，遵循 Slurm 调度及目标集群打包要求，以 scnet-hashcat 为运行标杆，并核对所选硬件和运行时的兼容性，包括选用海光（Hygon）Z100 DCU 时的适配。补齐中英文安装使用说明、真实正确性检查及最小单节点测试计划；获得计算节点证据前保持未验证状态，实测遵循已授权预算。
+> 使用 `$scnet-app` 将我提供的科学计算应用接入 SCNet 算力：明确区域、队列和资源预算，遵循 Slurm 调度及目标集群打包要求，参考当前候选应用映射，并核对所选硬件和运行时的兼容性，包括选用海光（Hygon）Z100 DCU 时的适配。补齐中英文安装使用说明、真实正确性检查及最小单节点测试计划；获得计算节点证据前保持未验证状态，实测遵循已授权预算。
 
 若要成品，可说：“用 `$scnet-app` 处理我提供的源码版本和验收算例；在我指定的 SCNet
 区域/队列、总预算及最大次数内持续修复并重测，直到 A 级门槛通过，再交付可安装的
@@ -47,6 +47,9 @@ python3 scripts/scnet_app.py --help
 详见[源码到 skill 的适配循环](references/adaptation-loop_CN.md)。SCNet 官方源码编译软件封装
 是必过基线，海光等目标环境适配及 agent 可用性是额外验收。
 已有应用仓库可原地采用同一规范；init 只创建新目录，不覆盖已有工作。
+
+不断更新的源码到 skill 生产计划维护在[roadmap/](roadmap/README.md)，
+外部工作流集成说明维护在[contrib/](contrib/README.md)。
 
 ## 最简流程
 
@@ -86,7 +89,7 @@ python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-i
 将文件名换成实际原始输出及日志。记录冻结文件摘要，在执行检查器前计算数值判据，
 检查期间输入被修改会失败。另加 `--job-id JOB_ID --remote-dir /absolute/remote/fresh-run --scnet-hpc /absolute/scnet-hpc`
 可通过只读 CLI 核对平台作业事实。本地产物验收、调度核对和硬件/运行时证据分别报告；
-v0.3 的 compute_verified 保持 false。
+当前版本的 compute_verified 保持 false。
 检查格式、超时/失败、来源标签及隐私边界见[验收与证据](references/verification_CN.md)。
 
 ## 分阶段前置条件
@@ -143,7 +146,7 @@ SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCN
 `--target hygon-c86` 显式生成 CPU 应用，默认零 DCU 和
 CPU 预算上限。实时调度/profile 事实优先于硬件提示。
 
-v0.3 先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
+当前契约先规范**单节点**验证。尚未实现 MPI、多节点 fan-out、数组作业、CUDA 自动转换
 或远端软件部署；本脚手架不宣称任何应用已适配成功。
 ABI/工具链、算子/精度、显存和数值验证边界见[Hygon Z100 DCU 指南](references/hygon-z100_CN.md)。
 
@@ -155,7 +158,7 @@ python3 -m unittest discover -s tests -v
 python3 scripts/validate_repo.py
 ```
 
-v0.3 验证包含预算、绑定、产物/检查器完整性、私有记录及作业核对的回归测试，
+当前验证包含预算、绑定、产物/检查器完整性、私有记录及作业核对的回归测试，
 以及真实 scnet-hpc 无凭证离线预览。v0.1 曾完成只读 doctor/resource-summary 接入。
 本版本未申请计算资源或完成实际应用适配。CI 覆盖 Ubuntu Python 3.8/3.12 和
 Windows Python 3.12，具体结果以当前提交检查为准。

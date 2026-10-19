@@ -1,8 +1,9 @@
-# scnet-hashcat 标杆应用
+# scnet-hashcat 候选参考
 
 [English](hashcat-reference.md) | 中文
 
-[scnet-hashcat](https://github.com/lql341/scnet-hashcat)作为以后 SCNet 应用 skill 的运行标杆。
+[scnet-hashcat](https://github.com/lql341/scnet-hashcat)当前作为以后 SCNet 应用 skill 的运行候选参考，
+不是永久科学标杆。应用晋级前应先按[参考应用评选规则](../roadmap/reference-application-rubric.md)评估。
 下列链接固定到已检查提交 `655ff24480c9ac6f01c7face01b7b9f91fa4d509`，更新引用前须检查差异。
 它处理授权的离线密码恢复；新应用复用工程做法，并保留自己的输入、语义及正确性标准。
 

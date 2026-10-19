@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.4.0
+Version: 0.4.1
 
 A meta-skill for integrating HPC, AI4S and scientific applications with
 [SCNet](https://www.scnet.cn) compute resources. It standardizes **resource binding,
@@ -13,10 +13,9 @@ the application supplies its scientific logic and correctness checks.
 Hardware/runtime compatibility, including **Hygon Z100 DCU / DTK**, is one part
 of this integration workflow.
 
-[scnet-hashcat](https://github.com/lql341/scnet-hashcat) is the reference application
-for operational behavior, packaging and evidence. See the
-[benchmark mapping](references/hashcat-reference.md) for reusable patterns and
-implementation differences; it is not a generated v1 application.
+`scnet-hashcat` is the current operational candidate for packaging and evidence,
+not a permanent scientific benchmark. See the [reference application rubric](roadmap/reference-application-rubric.md)
+and [production roadmap](roadmap/README.md) before promoting any application.
 
 ## Install with one sentence
 
@@ -39,7 +38,7 @@ The optional PyTorch probe has its own remote framework prerequisite.
 
 ## Ask the agent to adapt an application
 
-> Use `$scnet-app` to integrate the scientific application I provide with SCNet compute: bind its region/queue and resource budget, follow Slurm scheduling and target-cluster packaging requirements, use scnet-hashcat as the operational reference, and check hardware/runtime compatibility including Hygon Z100 DCU when selected. Deliver English/Chinese install and use instructions, a real correctness check and a minimal single-node smoke plan. Keep compatibility unverified until compute-node evidence exists; use only the authorized compute budget.
+> Use `$scnet-app` to integrate the scientific application I provide with SCNet compute: bind its region/queue and resource budget, follow Slurm scheduling and target-cluster packaging requirements, use the current operational candidate mappings, and check hardware/runtime compatibility including Hygon Z100 DCU when selected. Deliver English/Chinese install and use instructions, a real correctness check and a minimal single-node smoke plan. Keep compatibility unverified until compute-node evidence exists; use only the authorized compute budget.
 
 For a finished application rather than a scaffold, say: "Use `$scnet-app` on this
 source revision and my acceptance case; within the SCNet region/queue, total
@@ -57,6 +56,10 @@ source-built software packaging standard is the mandatory baseline; target
 compatibility and agent usability add further gates.
 Existing application repositories can adopt the contract in place; init only creates
 new repositories and never overwrites one.
+
+The evolving source-to-skill production plan is maintained under
+[roadmap/](roadmap/README.md). Optional external workflow integrations are
+documented under [contrib/](contrib/README.md).
 
 ## Minimal workflow
 
@@ -99,7 +102,7 @@ Replace artifact names with actual raw outputs/logs. The record freezes hashes,
 checks numeric criteria before the checker, and rejects input changes. Add
 `--job-id JOB_ID --remote-dir /absolute/remote/fresh-run --scnet-hpc /absolute/scnet-hpc`
 to check the platform's job facts through its read-only CLI. Local correctness,
-scheduler confirmation and hardware/runtime evidence are separate; v0.3 keeps
+scheduler confirmation and hardware/runtime evidence are separate; the current release keeps
 `compute_verified: false`. See [acceptance and evidence](references/verification.md)
 for formats, failure/timeout handling, source labels and privacy limits.
 
@@ -168,7 +171,7 @@ deployment until explicitly selected. Hardware profile hints are not live availa
 `--target hygon-c86` explicitly creates a CPU application with zero DCUs and CPU
 budget caps. Live scheduler/profile facts take precedence over hints.
 
-v0.3 standardizes **single-node** pilots. MPI, distributed fan-out, arrays, automatic
+The current contract standardizes **single-node** pilots. MPI, distributed fan-out, arrays, automatic
 CUDA conversion and remote software deployment are not implemented. No application
 has been certified by this scaffold. See [Hygon Z100 DCU guidance](references/hygon-z100.md)
 for ABI/toolchain, operator/dtype, memory and numerical verification boundaries.
@@ -192,7 +195,7 @@ python3 -m unittest discover -s tests -v
 python3 scripts/validate_repo.py
 ```
 
-v0.3 verification includes regression tests for budgets, binding, artifact/checker
+Current verification includes regression tests for budgets, binding, artifact/checker
 integrity, private records and job confirmation, plus a real scnet-hpc offline
 submit preview without credentials. Earlier v0.1 read-only doctor/resource-summary
 access succeeded. No compute allocation or application adaptation was performed

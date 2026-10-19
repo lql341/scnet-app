@@ -121,4 +121,5 @@ validate/plan 只重读记录，不执行检查器、不访问 SCNet。
 及依赖栈不成为本项目依赖。参考固定到提交 d38150de76b45a0992bcfe175957d08004b7319a：
 [GateService](https://github.com/huawei-noah/noah-research/blob/d38150de76b45a0992bcfe175957d08004b7319a/ScienceFlow/scienceflow/gates/service.py)、
 [产物证据](https://github.com/huawei-noah/noah-research/blob/d38150de76b45a0992bcfe175957d08004b7319a/ScienceFlow/scienceflow/solver/lnr/global_merge/candidate_evidence.py)。
-运行标杆仍为 [scnet-hashcat](hashcat-reference_CN.md)。
+当前运行映射为 [scnet-hashcat](hashcat-reference_CN.md)，其标杆地位仍需按
+参考应用评选规则持续评估。

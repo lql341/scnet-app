@@ -16,14 +16,16 @@ respond in the user's language.
   lifecycle. Call its CLI; do not vendor another transport/authentication client.
 - Bind applications to explicit SCNet resources and site packaging/scheduler policy.
   Read references/cluster-integration.md; do not equate a valid package with runtime
-  certification. Use references/hashcat-reference.md as the operational benchmark.
+  certification. Use references/hashcat-reference.md as an operational candidate
+  mapping; consult roadmap/reference-application-rubric.md before promoting a
+  benchmark.
 - The bundled default target is Hygon Z100 DCU/DTK, one compatibility path within
   the integration workflow. Hygon C86 CPU is an explicit separate target;
   never silently fall back from DCU to CPU or CUDA compatibility to native HIP.
 - Hygon Z100 DCU/gfx906 and capacity in targets/ are versioned profile hints. Actual allocated
   compute-node evidence determines support. Do not infer dtype, Triton, custom
   operator, collective or model support from a product name or import success.
-- v0.3 plans one-node workloads only. MPI/fan-out/arrays require a later explicit
+- The current contract plans one-node workloads only. MPI/fan-out/arrays require a later explicit
   execution contract; do not generate idle-node allocations or claim them supported.
 
 ## Adaptation workflow
@@ -78,7 +80,7 @@ validation notes and a six-axis stack signature.
 Read [references/contract.md](references/contract.md) for fields and evidence.
 Follow [cluster integration](references/cluster-integration.md) for resource,
 scheduler and runtime packaging requirements and the
-[scnet-hashcat reference](references/hashcat-reference.md) for concrete examples.
+[scnet-hashcat mapping](references/hashcat-reference.md) for concrete examples.
 The stock hooks fail; submit=null until hooks/acceptance, explicit binding, pinned
 provenance, a configured stack and an authorized per-job budget are ready and in
 range. Structured checks are required for record. Existing v1 packages remain
@@ -109,3 +111,5 @@ additionally calls scnet-hpc's read-only job command. See
 are not tamper-proof signatures; no automatic hardware certification is provided.
 Chinese references: references/adaptation-loop_CN.md, references/contract_CN.md, references/cluster-integration_CN.md,
 references/hashcat-reference_CN.md, references/verification_CN.md and references/hygon-z100_CN.md.
+The evolving production plan is in roadmap/; optional external integrations are
+kept under contrib/.
