@@ -4,6 +4,10 @@
 和数值验证。本机不编译 OpenFOAM。调度优先使用 scnet-hpc OpenAPI；SSH 只用于
 上传脚本、读取日志和必要诊断。
 
+昆山远端目录、保留结果和后续入口见
+[昆山 OpenFOAM 工作目录](openfoam-kunshan-layout_CN.md)。远端根目录同时保留
+同内容的 `README.md`。
+
 ## 独立目录
 
 共享源码只作为只读输入：
