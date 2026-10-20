@@ -59,6 +59,24 @@ clean-install、relocation 和 idempotency；每项都保存原始日志和退�
   `installation_test_rc=0`、`icoFoam=present`，OpenAPI 平台退出状态为 0。
 - 作业 `<JOB_ID>`：同一 GCC11 安装的 cavity tutorial smoke 完成，
   `blockMesh_rc=0`、`icoFoam_rc=0`、重复安装测试为 0，日志到达 `End`。
+- 作业 `<JOB_ID>`：GCC16.2/OpenMPI 5.0.11 独立源码树完成，使用
+  `-std=gnu17` 修复 Scotch C 兼容性，并使用串行 PSTL backend；平台退出状态为
+  0，`allwmake_rc=0`、`installation_test_rc=0`、`icoFoam=present`。安装测试输出
+  `Base configuration ok.`、`Critical systems ok.`、`Done`，未发现真实错误标记。
+- 作业 `<JOB_ID>`：同一 GCC16 安装的 cavity tutorial smoke 完成，平台退出状态
+  为 0；`blockMesh_rc=0`、`icoFoam_rc=0`、重复安装测试为 0，日志到达 `End`，
+  最终时间为 `0.05`，连续性误差约 `1e-9`。
+- 作业 `<JOB_ID>`：GCC16 clean-shell 安装测试、两次幂等性检查和 job-unique
+  relocation 硬链接树测试均通过，平台退出状态为 0；四份日志均包含 `Done`，
+  relocation 日志确认 `icoFoam` 可执行文件仍可见。
+
+## 验证分层
+
+完整 `Allwmake` 会编译全部 OpenFOAM 库和应用，包含多相、颗粒、分子、伴随和
+网格工具，适合每个工具链/源码提交做一次发行验收，不适合作为日常回归 case。
+日常验证复用已验收的独立安装，只运行工具链探针、`foamInstallationTest`、
+`blockMesh`、短时 `icoFoam` cavity 和数值日志检查。源码改动需要重新验证时，
+优先增加定向库/应用构建，不要默认重复全量 `Allwmake`。
 
 ## 调度命令
 
