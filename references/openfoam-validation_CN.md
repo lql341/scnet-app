@@ -55,6 +55,10 @@ clean-install、relocation 和 idempotency；每项都保存原始日志和退�
   `build/linux64GccDPInt32Opt/_project_.Makefile` 缺失，已取消，不能作为构建证据。
 - 作业 `<JOB_ID>`：使用 Git/ThirdParty 快照的 GCC11 作业因 ThirdParty 全量复制
   过慢而取消，未产生构建证据。
+- 作业 `<JOB_ID>`：GCC11 独立构建完成，`allwmake_rc=0`、
+  `installation_test_rc=0`、`icoFoam=present`，OpenAPI 平台退出状态为 0。
+- 作业 `<JOB_ID>`：同一 GCC11 安装的 cavity tutorial smoke 完成，
+  `blockMesh_rc=0`、`icoFoam_rc=0`、重复安装测试为 0，日志到达 `End`。
 
 ## 调度命令
 
