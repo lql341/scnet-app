@@ -144,6 +144,9 @@ SSH 私钥或接口地址。本地安装不部署科学应用，也不开通 SCN
 OpenFOAM v2606 在昆山的远端构建、工具链探针、独立源码树约束及成功门槛见
 [OpenFOAM 远端构建验收](references/openfoam-validation_CN.md)。该流程不会在本机编译
 OpenFOAM，也不会把 `Allwmake` 返回 0 单独当作成功。
+可复用的 OpenFOAM 应用 skill 已单独整理到
+[scnet-openfoam](https://github.com/lql341/scnet-openfoam)；本仓库只保留
+SCNet 应用契约和接入边界，不收录昆山现场目录或原始作业日志。
 
 脚手架默认 1 节点、共 8 核、1 DCU、3 分钟，配同等单作业预算上限。
 区域 0 / unconfigured profile 和队列在明确选择前阻止部署，硬件 profile 提示不代表实时可用性。

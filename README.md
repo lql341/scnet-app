@@ -194,6 +194,11 @@ project's integration conventions, applied with the target site's actual policie
 they are not a claim of universal SCNet packaging certification. `validate` checks
 the application descriptor and staged file paths, not every site/runtime policy.
 
+The reusable OpenFOAM application skill is maintained separately in
+[scnet-openfoam](https://github.com/lql341/scnet-openfoam); this meta-skill keeps
+the SCNet application contract and integration boundaries, not Kunshan run paths
+or raw job logs.
+
 The scaffold starts with one node, eight **total** CPUs, one DCU and three minutes,
 with matching per-job budget caps. Region 0 / unconfigured profile/queue block
 deployment until explicitly selected. Hardware profile hints are not live availability.
