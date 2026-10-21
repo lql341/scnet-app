@@ -63,7 +63,11 @@ inventory or version string is a profile hint, not runtime evidence.
 Design for a blank account: never assume the maintainer's module, prefix,
 modulefile or toolchain. Accept a site module, a private module path, or a
 user-owned binary plus environment script, and probe the allocated node before
-claiming support.
+claiming support. Prefer user-level modules/prefixes unless the site explicitly
+publishes them.
+
+Remote execution is Linux even when the local agent host is Windows, macOS or
+Linux. Keep remote paths POSIX and local orchestration/checkers cross-platform.
 
 ## Hooks
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.4 (2026-10-21)
+
+- Require user-level module/prefix assumptions and explicit blank-account
+  probing.
+- Distinguish the Linux compute target from a Windows, macOS or Linux local
+  agent host; keep remote paths POSIX and local helpers cross-platform.
+
 ## 0.4.3 (2026-10-21)
 
 - Add a blank-account baseline: do not assume a maintainer-owned module,
