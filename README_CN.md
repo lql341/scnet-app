@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-版本：0.4.1
+版本：0.4.2
 
 面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
 用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，

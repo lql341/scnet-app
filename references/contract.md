@@ -46,6 +46,20 @@ included in evidence but does not change binary ABI naming; the backend version
 and product target do. A configured DCU application must include those values in
 both `delivery.json.module_name` and `delivery.json.package_name`.
 
+## Validation tracks
+
+The contract above describes a source-built, deliverable application. Two lighter
+tracks are explicit and must not be forced into that package shape:
+
+- **existing-module validation**: validate a site module/binary, queue, device,
+  CPU oracle, backend execution and numerical tolerance; do not rebuild or
+  produce an A/B/C runtime package by default;
+- **runtime/framework probe**: prove one minimal capability on the target node;
+  it is not application correctness.
+
+Record the selected track and only the evidence that track requires. A module
+inventory or version string is a profile hint, not runtime evidence.
+
 ## Hooks
 
 run.sh runs in the remote run directory. It must select the intended device/runtime,

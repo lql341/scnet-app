@@ -50,6 +50,18 @@ New applications must also freeze the complete six-axis `stack` signature and
 `validation.criterion_version`. The record stores the normalized signature after
 external binding platform values are applied.
 
+## Backend evidence and version adaptation
+
+Record backend evidence at three levels: the device is visible, the backend is
+selected for the run, and the specific compute stage executed on the device.
+The first two do not prove the third. Keep this runtime evidence separate from
+application correctness and scheduler confirmation.
+
+For module-based applications, pin the expected module/version and use a
+profile or private module path for candidate builds. After an upgrade, re-run
+the same cases and re-baseline tolerances only from measured values. A version
+mismatch is a configuration failure, not a scientific result.
+
 ## Resource binding and budget
 
 New scaffolds use `unconfigured` and region `0`; choose the real enabled profile,

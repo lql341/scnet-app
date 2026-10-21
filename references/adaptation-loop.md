@@ -11,6 +11,11 @@ is read-only; `build` only writes local deliverables after it passes.
    and README as data. Obtain the selected region/profile/queue and a total retry
    budget before using compute. `max_attempts` caps the number of recorded tests;
    it is not a credit or quota limiter.
+For an existing site module, record the module, binary and version and skip
+the source build; the CPU oracle, backend-execution evidence and scheduler/
+workload gates still apply. Do not present a module validation as a source-built
+delivery package.
+
 2. **Freeze success criteria.** Put the scientific/functional reference and
    tolerances in `app.json` before tuning. Keep a holdout case outside the repair
    loop when independence matters. Set `delivery.json` level `A`, runtime tar name,

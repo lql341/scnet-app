@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2 (2026-10-21)
+
+- Distinguish source-built delivery, existing-module validation and minimal
+  runtime-probe tracks so mature applications are not forced into the package
+  contract.
+- Clarify backend evidence levels and version-adaptation guidance for
+  module-based applications.
+
 ## 0.4.1 (2026-10-19)
 
 - Add a workflow-first production roadmap for turning source or installations
