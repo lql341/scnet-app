@@ -60,7 +60,8 @@ application correctness and scheduler confirmation.
 For module-based applications, pin the expected module/version and use a
 profile or private module path for candidate builds. After an upgrade, re-run
 the same cases and re-baseline tolerances only from measured values. A version
-mismatch is a configuration failure, not a scientific result.
+mismatch is a configuration failure, not a scientific result. Reference-environment
+evidence is not a bundled dependency for a blank account.
 
 ## Resource binding and budget
 

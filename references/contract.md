@@ -60,6 +60,11 @@ tracks are explicit and must not be forced into that package shape:
 Record the selected track and only the evidence that track requires. A module
 inventory or version string is a profile hint, not runtime evidence.
 
+Design for a blank account: never assume the maintainer's module, prefix,
+modulefile or toolchain. Accept a site module, a private module path, or a
+user-owned binary plus environment script, and probe the allocated node before
+claiming support.
+
 ## Hooks
 
 run.sh runs in the remote run directory. It must select the intended device/runtime,

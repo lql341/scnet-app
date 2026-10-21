@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3 (2026-10-21)
+
+- Add a blank-account baseline: do not assume a maintainer-owned module,
+  prefix, modulefile or toolchain; probe the allocated node first.
+
 ## 0.4.2 (2026-10-21)
 
 - Distinguish source-built delivery, existing-module validation and minimal
