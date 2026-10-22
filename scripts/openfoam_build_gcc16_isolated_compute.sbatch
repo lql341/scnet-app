@@ -3,16 +3,15 @@
 # The source and ThirdParty trees are copied on the compute node into a
 # job-unique directory. Scotch is compiled as GNU17 C for GCC 16.
 #SBATCH --job-name=foam2606_gcc16_iso
-#SBATCH --partition=<QUEUE>
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=03:00:00
-#SBATCH --output=<OPENFOAM_VALIDATION_ROOT>/gcc16-iso-%j.out
-#SBATCH --error=<OPENFOAM_VALIDATION_ROOT>/gcc16-iso-%j.err
+#SBATCH --output=gcc16-iso-%j.out
+#SBATCH --error=gcc16-iso-%j.err
 set -o pipefail
 
-base=<OPENFOAM_VALIDATION_ROOT>
+base="${OPENFOAM_VALIDATION_ROOT:?set OPENFOAM_VALIDATION_ROOT}"
 src="$base/openfoam"
 third_src="$base/ThirdParty-v2606"
 src_commit=481094fdf34f11ed6d0d603ee59a858a0124236d

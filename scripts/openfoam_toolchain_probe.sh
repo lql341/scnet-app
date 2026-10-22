@@ -2,7 +2,7 @@
 # Probe OpenFOAM v2606's compiler/MPI/PSTL prerequisites on a remote SCNet node.
 set -u
 
-WORK_ROOT="${1:-<OPENFOAM_VALIDATION_ROOT>}"
+WORK_ROOT="${1:-${OPENFOAM_VALIDATION_ROOT:?set OPENFOAM_VALIDATION_ROOT}}"
 OUT_DIR="${2:-${WORK_ROOT}/probe}"
 mkdir -p "${OUT_DIR}"
 LOG="${OUT_DIR}/toolchain-probe-${SLURM_JOB_ID:-interactive}.log"
@@ -23,8 +23,8 @@ module purge
 module load compiler/gcc/11.2.0 || fail "compiler/gcc/11.2.0"
 module load openmpi/5.0.11 || fail "openmpi/5.0.11"
 
-GCC11_PREFIX="/public/software/compiler/gcc/11.2.0"
-export PATH="${GCC11_PREFIX}/bin:<OPENMPI_PREFIX>/bin:${PATH}"
+GCC11_PREFIX="${GCC11_PREFIX:-/public/software/compiler/gcc/11.2.0}"
+export PATH="${GCC11_PREFIX}/bin:${PATH}"
 export CC="${GCC11_PREFIX}/bin/gcc"
 export CXX="${GCC11_PREFIX}/bin/g++"
 export FC="${GCC11_PREFIX}/bin/gfortran"

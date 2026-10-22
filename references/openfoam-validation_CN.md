@@ -1,16 +1,16 @@
 # OpenFOAM v2606 远端构建验收
 
-本流程只在昆山 `kseshell` 计算节点执行 OpenFOAM 编译、安装测试、tutorial
-和数值验证。本机不编译 OpenFOAM。调度优先使用 scnet-hpc OpenAPI；SSH 只用于
-上传脚本、读取日志和必要诊断。
+本流程只在 SCNet 计算节点执行 OpenFOAM 编译、安装测试、tutorial 和数值验证。
+本机不编译 OpenFOAM。调度优先使用 scnet-hpc OpenAPI；SSH 只用于上传脚本、
+读取日志和必要诊断。
 
 ## 独立目录
 
-共享源码只作为只读输入：
+共享源码只作为只读输入，路径由提交者通过环境变量提供，不写入仓库：
 
 ```text
-<OPENFOAM_VALIDATION_ROOT>/openfoam
-<OPENFOAM_VALIDATION_ROOT>/ThirdParty-v2606
+$OPENFOAM_VALIDATION_ROOT/openfoam
+$OPENFOAM_VALIDATION_ROOT/ThirdParty-v2606
 ```
 
 每个作业在唯一的 `work/runs/<toolchain>-<job-id>/` 中创建源码、ThirdParty、
@@ -22,11 +22,11 @@ GCC11 与 GCC16 不并发写入任何目录。
 
 ## 工具链约束
 
-- GCC11：`/public/software/compiler/gcc/11.2.0`，OpenMPI `5.0.11`，通过
-  `OMPI_CC/OMPI_CXX/OMPI_FC` 指定底层编译器。
+- GCC11：`$GCC11_PREFIX`（默认站点路径 `/public/software/compiler/gcc/11.2.0`），
+  OpenMPI `5.0.11`，通过 `OMPI_CC/OMPI_CXX/OMPI_FC` 指定底层编译器。
 - GCC16：`compiler/dtk/26.04` 与 OpenMPI `5.0.11`，Scotch C 编译增加
   `-std=gnu17`。
-- 昆山旧 TBB 与 GCC11/GCC16 的 libstdc++ PSTL backend 不兼容。构建和探针都必须
+- 站点旧 TBB 与 GCC11/GCC16 的 libstdc++ PSTL backend 不兼容。构建和探针都必须
   使用 `-D_PSTL_PAR_BACKEND_SERIAL`。
 - 系统 GCC 4.8.5、旧 CMake 和可选 KAHIP/ADIOS2 失败不能单独判定 OpenFOAM 核心失败。
 
@@ -47,27 +47,29 @@ clean-install、relocation 和 idempotency；每项都保存原始日志和退�
 
 ## 已确认证据
 
-- 作业 `<JOB_ID>`：GCC11/OpenMPI 默认 PSTL 失败，出现旧 TBB
-  `tbb::this_task_arena` 错误；该作业作为失败证据。
-- 作业 `<JOB_ID>`：GCC11.2/OpenMPI 5.0.11 的 MPI C、串行 PSTL C++、
-  MPI+PSTL 探针全部通过，平台退出状态为 0。
-- 作业 `<JOB_ID>`：旧 `cp -a` 复制共享源码时遇到
+以下只记录结论，不保留维护者作业号或原始日志：
+
+- 一次 GCC11/OpenMPI 默认 PSTL 运行失败，出现旧 TBB
+  `tbb::this_task_arena` 错误；该运行作为失败证据。
+- 一次 GCC11.2/OpenMPI 5.0.11 运行中，MPI C、串行 PSTL C++、MPI+PSTL 探针
+  全部通过，平台退出状态为 0。
+- 一次旧 `cp -a` 复制共享源码的运行遇到
   `build/linux64GccDPInt32Opt/_project_.Makefile` 缺失，已取消，不能作为构建证据。
-- 作业 `<JOB_ID>`：使用 Git/ThirdParty 快照的 GCC11 作业因 ThirdParty 全量复制
-  过慢而取消，未产生构建证据。
-- 作业 `<JOB_ID>`：GCC11 独立构建完成，`allwmake_rc=0`、
-  `installation_test_rc=0`、`icoFoam=present`，OpenAPI 平台退出状态为 0。
-- 作业 `<JOB_ID>`：同一 GCC11 安装的 cavity tutorial smoke 完成，
+- 一次使用 Git/ThirdParty 快照的 GCC11 运行因 ThirdParty 全量复制过慢而取消，
+  未产生构建证据。
+- 一次 GCC11 独立构建完成，`allwmake_rc=0`、`installation_test_rc=0`、
+  `icoFoam=present`，OpenAPI 平台退出状态为 0。
+- 一次同一 GCC11 安装的 cavity tutorial smoke 完成，
   `blockMesh_rc=0`、`icoFoam_rc=0`、重复安装测试为 0，日志到达 `End`。
-- 作业 `<JOB_ID>`：GCC16.2/OpenMPI 5.0.11 独立源码树完成，使用
+- 一次 GCC16.2/OpenMPI 5.0.11 独立源码树构建完成，使用
   `-std=gnu17` 修复 Scotch C 兼容性，并使用串行 PSTL backend；平台退出状态为
   0，`allwmake_rc=0`、`installation_test_rc=0`、`icoFoam=present`。安装测试输出
   `Base configuration ok.`、`Critical systems ok.`、`Done`，未发现真实错误标记。
-- 作业 `<JOB_ID>`：同一 GCC16 安装的 cavity tutorial smoke 完成，平台退出状态
-  为 0；`blockMesh_rc=0`、`icoFoam_rc=0`、重复安装测试为 0，日志到达 `End`，
+- 一次同一 GCC16 安装的 cavity tutorial smoke 完成，平台退出状态为 0；
+  `blockMesh_rc=0`、`icoFoam_rc=0`、重复安装测试为 0，日志到达 `End`，
   最终时间为 `0.05`，连续性误差约 `1e-9`。
-- 作业 `<JOB_ID>`：GCC16 clean-shell 安装测试、两次幂等性检查和 job-unique
-  relocation 硬链接树测试均通过，平台退出状态为 0；四份日志均包含 `Done`，
+- 一次 GCC16 clean-shell 安装测试、两次幂等性检查和 job-unique relocation
+  硬链接树测试均通过，平台退出状态为 0；四份日志均包含 `Done`，
   relocation 日志确认 `icoFoam` 可执行文件仍可见。
 
 ## 验证分层
@@ -81,8 +83,8 @@ clean-install、relocation 和 idempotency；每项都保存原始日志和退�
 ## 调度命令
 
 ```bash
-python3 <SCNET_HPC>/scripts/scnet.py \
-  --backend openapi --cluster kseshell wait JOB_ID \
+python3 <scnet-hpc>/scripts/scnet.py \
+  --backend openapi --cluster <profile> wait JOB_ID \
   --wait-timeout 300 --interval 20
 ```
 

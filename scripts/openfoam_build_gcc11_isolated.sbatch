@@ -3,16 +3,15 @@
 # The source and ThirdParty trees are copied on the compute node into a
 # job-unique directory, so no two jobs mutate shared lnInclude/platforms data.
 #SBATCH --job-name=foam2606_gcc11_iso
-#SBATCH --partition=<QUEUE>
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=03:00:00
-#SBATCH --output=<OPENFOAM_VALIDATION_ROOT>/gcc11-iso-%j.out
-#SBATCH --error=<OPENFOAM_VALIDATION_ROOT>/gcc11-iso-%j.err
+#SBATCH --output=gcc11-iso-%j.out
+#SBATCH --error=gcc11-iso-%j.err
 set -o pipefail
 
-base=<OPENFOAM_VALIDATION_ROOT>
+base="${OPENFOAM_VALIDATION_ROOT:?set OPENFOAM_VALIDATION_ROOT}"
 src="$base/openfoam"
 third_src="$base/ThirdParty-v2606"
 src_commit=481094fdf34f11ed6d0d603ee59a858a0124236d
@@ -25,7 +24,7 @@ testlog="$run/foamInstallationTest.txt"
 
 module purge
 module load openmpi/5.0.11
-gcc11=/public/software/compiler/gcc/11.2.0
+gcc11=${GCC11_PREFIX:-/public/software/compiler/gcc/11.2.0}
 export PATH="$gcc11/bin:$PATH"
 export LD_LIBRARY_PATH="$gcc11/lib64:${LD_LIBRARY_PATH:-}"
 export CC="$gcc11/bin/gcc" CXX="$gcc11/bin/g++" FC="$gcc11/bin/gfortran"

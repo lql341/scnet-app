@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=foam2606_gcc11
-#SBATCH --partition=<QUEUE>
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=02:00:00
-#SBATCH --output=<OPENFOAM_VALIDATION_ROOT>/build4-%j.out
-#SBATCH --error=<OPENFOAM_VALIDATION_ROOT>/build4-%j.err
+#SBATCH --output=build4-%j.out
+#SBATCH --error=build4-%j.err
 set -o pipefail
 
-base=<OPENFOAM_VALIDATION_ROOT>
+base="${OPENFOAM_VALIDATION_ROOT:?set OPENFOAM_VALIDATION_ROOT}"
 foam="$base/openfoam"
 third="$base/ThirdParty-v2606"
 
@@ -19,7 +18,7 @@ module load openmpi/5.0.11
 # OpenMPI 5.0.11 loads GCC 16.2 internally.  Keep that MPI installation,
 # but explicitly select the independently installed GCC 11 toolchain for
 # OpenFOAM and its ThirdParty C/C++ builds.
-gcc11=/public/software/compiler/gcc/11.2.0
+gcc11=${GCC11_PREFIX:-/public/software/compiler/gcc/11.2.0}
 export PATH="$gcc11/bin:$PATH"
 export LD_LIBRARY_PATH="$gcc11/lib64:${LD_LIBRARY_PATH:-}"
 export CC="$gcc11/bin/gcc"

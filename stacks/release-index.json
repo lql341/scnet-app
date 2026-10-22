@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "updated": "2026-10-22",
+  "components": {
+    "scnet-app": "0.6.2",
+    "scnet-hpc": "0.6.14",
+    "scnet-hashcat": "0.2.6",
+    "scnet-gromacs": "0.10.1",
+    "scientific-dcu-porting": "0.3.1"
+  },
+  "entries": [
+    {
+      "application": "scnet-hashcat",
+      "skill_version": "0.2.6",
+      "adapter": "scripts/scnet_lite.py",
+      "adapter_commit": "2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2",
+      "scnet_hpc_min": "0.6.13",
+      "scnet_hpc_tested": "0.6.14",
+      "runtime": "dtk 26.04 / HIP",
+      "target": "hygon-z100",
+      "module": "hashcat/7.1.2-dtk26.04-z100",
+      "validated_scope": [
+        "offline input precheck and dry-run",
+        "single-node DCU synthetic workload",
+        "scheduler completion and result collection"
+      ],
+      "unverified": [
+        "real user hash material in the repository",
+        "production-scale keyspace",
+        "other sites and runtimes"
+      ]
+    },
+    {
+      "application": "scnet-gromacs",
+      "skill_version": "0.10.1",
+      "adapter": "scripts/scnet_lite.py",
+      "adapter_commit": "c2dc6d239ddee2c724e900cc3b5e37facd911d2e",
+      "scnet_hpc_min": "0.6.13",
+      "scnet_hpc_tested": "0.6.14",
+      "runtime": "OpenMPI 5 + UCX + HIP",
+      "target": "hygon-z100",
+      "module": "gromacs/2026.3-dtk26.04-z100; gromacs/2026.4-dtk26.04-z100",
+      "validated_scope": [
+        "CPU/HIP energy comparison",
+        "PME decomposition",
+        "two-GPU and two-node/four-GPU smoke",
+        "PMPI compatibility profile"
+      ],
+      "unverified": [
+        "production-scale performance",
+        "GPU-aware MPI as a default",
+        "HCOLL as a default",
+        "more than two nodes"
+      ]
+    }
+  ]
+}

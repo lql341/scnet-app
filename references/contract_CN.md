@@ -89,6 +89,13 @@ backend 版本和产品机型会改变命名。已配置的 DCU 应用必须在
 adapter 最小接口：区域选择、account/queues/limits、远端 mkdir/list/upload/download、
 submit、wait、job detail。SSH 不属于该 adapter，且不得静默 fallback。
 
+生成的 bridge 模板必须提供可工作的离线 `doctor`、`references/first-use.md` 和独立的
+`scripts/check_contract.py`。bridge doctor 可以只检查环境变量凭证和 `app.json` 的
+region/queue；共享凭证库和远端状态必须标为 unknown，不能标为 ready。只有真正内嵌
+固定 adapter 的应用才需要真实 vendor manifest；不要在 bridge 模板里放空 manifest
+制造合规假象。数值/功能正确性留在 `check.py`，onboarding 结构检查放在
+`check_contract.py`。
+
 ### 首次使用交互契约
 
 每个派生应用必须支持非秘密、机器可读的首次使用检查，并遵循以下 agent 流程：
@@ -126,7 +133,7 @@ planner 不执行命令，只返回只读预检、mkdir/显式上传、scnet-hpc
 完成钩子后的提交参数数组。调用数组时不用 shell=True；远端 Bash 正文引用路径、
 module 和钩子参数。计划虽不读取密钥，仍含本地/远端路径，应私密保存。
 
-桥接要求 scnet-hpc >=0.6.13，按 0.6.13 做协议验证。通过 --scnet-hpc、SCNET_HPC_ROOT
+桥接要求 scnet-hpc >=0.6.13，按 0.6.14 做协议验证。通过 --scnet-hpc、SCNET_HPC_ROOT
 或 Codex skill 目录定位，不静默切 SSH，不自行认证、缓存 token 或实现文件 API。
 应用与 scnet-hpc 独立版本。
 

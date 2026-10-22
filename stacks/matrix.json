@@ -9,7 +9,7 @@
       "backend": {"kind": "dcu", "runtime": "dtk", "version": "26.04", "target": "hygon-z100", "arch": "gfx906"},
       "mpi": {"vendor": "openmpi", "version": "5.0.11"},
       "framework": {"name": "none"},
-      "platform": {"adapter": "scnet-openapi", "region": "<REGION_ID>", "cluster": "<CLUSTER>", "queue": "<QUEUE>"},
+      "platform": {"adapter": "scnet-openapi", "region": "<region-id>", "cluster": "<profile>", "queue": "<queue>"},
       "applications": ["scnet-hashcat", "gromacs", "lammps"],
       "evidence": "Reference combination; application-specific validation remains separate."
     },
@@ -21,7 +21,7 @@
       "backend": {"kind": "dcu", "runtime": "dtk", "version": "26.04", "target": "hygon-z100", "arch": "gfx906"},
       "mpi": {"vendor": "platform-openmpi", "version": "4.1.5"},
       "framework": {"name": "none"},
-      "platform": {"adapter": "scnet-openapi", "region": "<REGION_ID>", "cluster": "<CLUSTER>", "queue": "<QUEUE>"},
+      "platform": {"adapter": "scnet-openapi", "region": "<region-id>", "cluster": "<profile>", "queue": "<queue>"},
       "applications": ["gromacs", "lammps"],
       "evidence": "Fallback MPI variant; conflicts with OpenMPI 5 packages."
     }

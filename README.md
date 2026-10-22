@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.6.1
+Version: 0.6.2
 
 A meta-skill for authoring application skills for HPC, AI4S and scientific
 workloads on [SCNet](https://www.scnet.cn). `scnet-hpc` is the foundation;
@@ -18,6 +18,9 @@ of this integration workflow.
 `scnet-hashcat` is the current operational candidate for packaging and evidence,
 not a permanent scientific benchmark. See the [reference application rubric](roadmap/reference-application-rubric.md)
 and [production roadmap](roadmap/README.md) before promoting any application.
+The cross-repository release index is [stacks/release-index.json](stacks/release-index.json):
+it records skill versions, pinned adapter commits, tested `scnet-hpc` versions,
+modules, validated scope and explicitly unverified scope.
 
 ## Install with one sentence
 
@@ -142,7 +145,7 @@ for formats, failure/timeout handling, source labels and privacy limits.
 | Stage | Required |
 | --- | --- |
 | init / validate | Local Python 3.8+ and this complete repository |
-| plan | Also a local scnet-hpc >=0.6.13; adapter tested with 0.6.13; no credentials/network |
+| plan | Also a local scnet-hpc >=0.6.13; adapter tested with 0.6.14; no credentials/network |
 | doctor | Also SCNet access, enabled region/queue and scnet-hpc credentials |
 | record | Authored checks, trusted local checker and explicit collected artifacts; optional --job-id also needs the doctor prerequisites |
 | Real application job | Account balance/quota, staged input/dependencies, shared writable storage, compatible application/DTK environment and requested devices |

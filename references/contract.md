@@ -106,6 +106,15 @@ The minimum adapter surface is: region selection, account/queues/limits, remote
 mkdir/list/upload/download, submit, wait and job detail. SSH is not part of this
 adapter and must never be a silent fallback.
 
+The generated bridge template must ship a working offline `doctor`, a
+`references/first-use.md` and a separate `scripts/check_contract.py`. A bridge
+doctor may check environment credentials and `app.json` region/queue only; it
+must report the shared credential store and remote state as unknown rather than
+ready. Only an application that actually embeds the pinned adapter must ship a
+real vendor manifest. Do not add an empty manifest to a bridge template; keep
+numerical/functional correctness in `check.py` and onboarding structure in
+`check_contract.py`.
+
 ### First-use interaction contract
 
 Every derived application must support a non-secret, machine-readable first-use
@@ -154,7 +163,7 @@ a submit command. Pass arrays to subprocess without shell=True. The remote Bash
 body quotes directory/module/hook arguments. Keep plans private: they contain
 local/remote paths even though no secrets are read.
 
-The bridge uses scnet-hpc >=0.6.13, with conformance tested against 0.6.13. Resolve
+The bridge uses scnet-hpc >=0.6.13, with conformance tested against 0.6.14. Resolve
 its root via --scnet-hpc, SCNET_HPC_ROOT or the Codex skill directory. It never
 silently selects SSH or implements its own authentication, token cache or file API.
 Application/scnet-hpc releases have independent versions.

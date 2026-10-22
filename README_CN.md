@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-版本：0.6.1
+版本：0.6.2
 
 面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
 用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，
@@ -13,7 +13,9 @@
 
 `scnet-hashcat` 当前只是运行行为、打包和验证证据的候选参考，不是永久科学标杆。
 应用候选需按[参考应用评选规则](roadmap/reference-application-rubric.md)比较，
-总体计划见[生产路线](roadmap/README.md)。
+总体计划见[生产路线](roadmap/README.md)。跨仓库发布索引见
+[stacks/release-index.json](stacks/release-index.json)：记录 skill 版本、固定 adapter
+commit、已验证的 `scnet-hpc` 版本、module、已验证范围和明确未验证范围。
 
 ## 一句话安装
 
@@ -97,7 +99,7 @@ python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-i
 | 阶段 | 前置条件 |
 | --- | --- |
 | init / validate | 本地 Python 3.8+ 和完整仓库 |
-| plan | 另需本地 scnet-hpc >=0.6.13，适配接口按 0.6.13 验证；不需凭证/联网 |
+| plan | 另需本地 scnet-hpc >=0.6.13，适配接口按 0.6.14 验证；不需凭证/联网 |
 | doctor | 另需 SCNet 网络、已开通区域/队列、scnet-hpc 凭证 |
 | record | 已实现的 checks、受信任的本地检查器及明确的回收产物；选用 --job-id 时还需 doctor 的前置条件 |
 | 真实应用作业 | 余额/配额、已准备输入/依赖、共享可写存储、兼容应用/DTK 环境和所申请设备 |

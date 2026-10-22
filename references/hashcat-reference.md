@@ -6,20 +6,20 @@ English | [中文](hashcat-reference_CN.md)
 candidate for future SCNet application skills, not a permanent scientific benchmark.
 Use the [reference application rubric](../roadmap/reference-application-rubric.md)
 before promoting any candidate. The links below pin reviewed commit
-`c2dc6d239ddee2c724e900cc3b5e37facd911d2e`; review changes before updating the reference.
+`2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2`; review changes before updating the reference.
 Its domain is authorized offline password recovery. Reuse its engineering patterns
 with the new application's own inputs, semantics and correctness criterion.
 
 | Reusable requirement | Reference implementation |
 | --- | --- |
-| English default, Chinese counterpart, installation vs remote prerequisites, one-sentence agent prompts | [README](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/README.md) and [installation](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/references/installation.md) |
-| First-use onboarding for a new account: activation, credentials, module, offline dry-run | [first use](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/references/first-use.md) |
-| Explicit resource target, staged inputs, run manifest, bounded job lifecycle and result collection | [hc.py](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/scripts/hc.py) |
-| Site module/runtime prerequisites, single coordinator, srun ranks, per-rank artifacts and failure propagation | [hc-node.sh](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/scripts/remote/hc-node.sh) |
-| Input partitioning, supported modes and workload-specific limits | [parallelization](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/references/parallelization.md) |
-| Compute-node results with declared synthetic inputs and scoped conclusions | [validation](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/references/validation.md) |
-| Single-skill entry with a pinned embedded OpenAPI adapter | [architecture](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/references/architecture.md) and [vendor manifest](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/scripts/vendor-manifest.json) |
-| Adapter provenance and integrity checks | [vendor manifest test](https://github.com/lql341/scnet-hashcat/blob/c2dc6d239ddee2c724e900cc3b5e37facd911d2e/tests/test_vendor_manifest.py) |
+| English default, Chinese counterpart, installation vs remote prerequisites, one-sentence agent prompts | [README](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/README.md) and [installation](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/references/installation.md) |
+| First-use onboarding for a new account: offline doctor, activation, credentials, module, dry-run | [first use](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/references/first-use.md) |
+| Explicit resource target, staged inputs, run manifest, bounded job lifecycle and result collection | [hc.py](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/scripts/hc.py) |
+| Site module/runtime prerequisites, single coordinator, srun ranks, per-rank artifacts and failure propagation | [hc-node.sh](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/scripts/remote/hc-node.sh) |
+| Input partitioning, supported modes and workload-specific limits | [parallelization](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/references/parallelization.md) |
+| Compute-node results with declared synthetic inputs and scoped conclusions | [validation](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/references/validation.md) |
+| Single-skill entry with a pinned embedded OpenAPI adapter | [architecture](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/references/architecture.md) and [vendor manifest](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/scripts/vendor-manifest.json) |
+| Adapter provenance, local checksum and pinned-source check | [adapter check](https://github.com/lql341/scnet-hashcat/blob/2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2/scripts/check_adapter.py) |
 
 ## Apply the benchmark without copying its boundaries
 

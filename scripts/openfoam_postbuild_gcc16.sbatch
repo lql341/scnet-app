@@ -2,15 +2,14 @@
 # Validate a completed GCC16 OpenFOAM tree from a clean shell and a relocated
 # read-only hard-link tree. The tree is job-unique and never replaces a result.
 #SBATCH --job-name=foam2606_gcc16_post
-#SBATCH --partition=<QUEUE>
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --time=00:30:00
 set -o pipefail
 
-base=<OPENFOAM_VALIDATION_ROOT>
-run="${FOAM_VALIDATION_RUN:-$base/work/runs/gcc16-<JOB_ID>}"
+base="${OPENFOAM_VALIDATION_ROOT:?set OPENFOAM_VALIDATION_ROOT}"
+run="${FOAM_VALIDATION_RUN:?set FOAM_VALIDATION_RUN to an accepted run directory}"
 foam="$run/openfoam"
 post="$base/work/runs/gcc16-post-${SLURM_JOB_ID}"
 reloc="$post/openfoam-relocated"

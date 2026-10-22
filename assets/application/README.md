@@ -19,6 +19,11 @@ publishing your application repository, replace this paragraph with its exact
 one-sentence install prompt and verify that installation in a clean directory.
 The generated repository has not been published automatically.
 
+Run `python3 scripts/doctor.py --json` for the offline first-use state and
+`python3 scripts/check_contract.py` to verify the generated onboarding files.
+The bridge doctor checks environment credentials and app.json region/queue only;
+it never claims remote activation or module deployment.
+
 Local Python 3.8+ and scnet-hpc >=0.6.13 provide orchestration. Real execution needs
 an SCNet account with the selected region/queue enabled, balance/quota, shared
 writable storage and a compatible application/DTK environment on compute nodes.

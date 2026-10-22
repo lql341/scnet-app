@@ -32,14 +32,14 @@ class ApplicationTests(unittest.TestCase):
         data["acceptance"] = "Compare scalar result to CPU reference 1.0 with absolute tolerance 1e-6."
         data["checks"] = [{"name": "energy", "kind": "numeric", "required": True, "file": "metrics.json", "key": "energy", "ref": 1.0, "atol": 1e-6}]
         data["provenance"] = {"revision": "a" * 40, "license": "MIT"}
-        data["scnet"] = {"backend": "openapi", "cluster": "kseshell", "region": "12345", "queue": "configured-queue"}
+        data["scnet"] = {"backend": "openapi", "cluster": "test-cluster", "region": "12345", "queue": "configured-queue"}
         data["stack"] = {
             "system": {"name": "centos7.6", "glibc": "2.17"},
             "toolchain": {"gcc": "16.2.0", "cmake": "4.4.3"},
             "backend": {"kind": "dcu", "runtime": "dtk", "version": "26.04", "target": "hygon-z100", "arch": "gfx906"},
             "mpi": {"vendor": "openmpi", "version": "5.0.11"},
             "framework": {"name": "none"},
-            "platform": {"adapter": "scnet-openapi", "region": "12345", "cluster": "kseshell", "queue": "configured-queue"},
+            "platform": {"adapter": "scnet-openapi", "region": "12345", "cluster": "test-cluster", "queue": "configured-queue"},
         }
         (self.root / data["run"]).write_text("#!/usr/bin/env bash\nexit 0\n")
         (self.root / data["check"]).write_text("raise SystemExit(0)\n")

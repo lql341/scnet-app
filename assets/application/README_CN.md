@@ -5,6 +5,10 @@
 版本：0.1.0。上游：__UPSTREAM__。目标：`__TARGET__`。
 状态：脚手架，尚未声明应用或计算节点适配通过。
 
+运行 `python3 scripts/doctor.py --json` 查看离线首次使用状态，并用
+`python3 scripts/check_contract.py` 校验生成的 onboarding 文件。bridge doctor
+只检查环境变量凭证和 app.json 的 region/queue，不声称远端已开通或 module 已部署。
+
 按[源码到 skill 的适配循环](references/adaptation-loop_CN.md)完成 delivery.json、
 runtime/app/、runtime/case/、runtime/scripts/。每次测试后保存记录并运行 scnet-app `gate`；
 全部满足后由 `build` 生成 skill 和官方软件包。交付前把本段替换为实测过的中英文安装、

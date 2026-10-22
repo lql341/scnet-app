@@ -16,6 +16,10 @@ binding. Region 0/unconfigured defaults do not identify an enabled deployment.
 
 Read `app.json` for the SCNet target, six-axis stack, prerequisites, budget,
 environment, artifact list and hooks.
+Run `python3 scripts/doctor.py` before first use. It is an offline, non-secret
+check: report one missing category at a time, never request AK/SK or private keys
+in chat, and do not claim remote readiness from a local pass. Follow
+references/first-use.md and `scripts/check_contract.py`.
 Use scnet-hpc for credentials, live resources, uploads, submit, wait, logs and cancel.
 Do not create a second OpenAPI client or credential store. Follow the English and
 Chinese README for installation/prerequisites and use the scnet-app planner when

@@ -205,6 +205,8 @@ def init_app(name, output, upstream, target):
     for source in template.rglob("*"):
         if source.is_file():
             relative = source.relative_to(template)
+            if any(part in ("__pycache__", ".git") for part in relative.parts) or source.suffix == ".pyc":
+                continue
             path = destination / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             text = (source.read_text(encoding="utf-8").replace("__APP_NAME__", name)

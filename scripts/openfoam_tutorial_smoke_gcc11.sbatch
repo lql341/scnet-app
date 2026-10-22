@@ -2,22 +2,21 @@
 # Run a short blockMesh + icoFoam cavity tutorial against one accepted
 # GCC11 installation. All writes stay below the job's unique run directory.
 #SBATCH --job-name=foam2606_gcc11_smoke
-#SBATCH --partition=<QUEUE>
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --time=00:30:00
 set -o pipefail
 
-base=<OPENFOAM_VALIDATION_ROOT>
-run="${FOAM_VALIDATION_RUN:-$base/work/runs/gcc11-<JOB_ID>}"
+base="${OPENFOAM_VALIDATION_ROOT:?set OPENFOAM_VALIDATION_ROOT}"
+run="${FOAM_VALIDATION_RUN:?set FOAM_VALIDATION_RUN to an accepted run directory}"
 foam="$run/openfoam"
 case_root="$run/validation/cavity-${SLURM_JOB_ID}"
 source_case="$foam/tutorials/incompressible/icoFoam/cavity/cavity"
 
 module purge
 module load openmpi/5.0.11
-gcc11=/public/software/compiler/gcc/11.2.0
+gcc11=${GCC11_PREFIX:-/public/software/compiler/gcc/11.2.0}
 export PATH="$gcc11/bin:$foam/wmake:$PATH"
 export LD_LIBRARY_PATH="$gcc11/lib64:${LD_LIBRARY_PATH:-}"
 export CC="$gcc11/bin/gcc" CXX="$gcc11/bin/g++" FC="$gcc11/bin/gfortran"

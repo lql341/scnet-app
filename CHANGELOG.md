@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.2 (2026-10-22)
+
+- Sanitize tracked OpenFOAM validation paths and remove scheduler job IDs from
+  public examples; parameterize scripts and add a private-material release scan.
+- Add a working bridge-template doctor, first-use reference, contract checker and
+  missing-credential test to `assets/application`.
+- Clarify the bridge-template and embedded-adapter contract split: only an
+  embedded adapter needs a real vendor manifest; numerical checks stay in
+  `check.py`, onboarding checks in `check_contract.py`.
+- Refresh the scnet-hashcat reference to the 0.2.6 offline-doctor and
+  adapter-pin-check commit, and record conformance with scnet-hpc 0.6.14.
+
 ## 0.6.1 (2026-10-21)
 
 - Standardize the canonical embedded adapter surface and require checksum/method
