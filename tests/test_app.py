@@ -140,7 +140,9 @@ class ApplicationTests(unittest.TestCase):
     def test_real_scnet_hpc_dry_run_contract_without_credentials(self):
         data = self.ready()
         hpc_root = Path(os.environ["SCNET_HPC_TEST_ROOT"])
-        profiles = sorted((hpc_root / "clusters").glob("*.conf"))
+        profiles = sorted(
+            p for p in (hpc_root / "clusters").glob("*.conf") if not p.name.startswith("_")
+        )
         if not profiles:
             self.skipTest("scnet-hpc test root has no cluster profile")
         data["scnet"]["cluster"] = profiles[0].stem
