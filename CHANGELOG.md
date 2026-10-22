@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.6 (2026-10-21)
+
+- Fix Windows local level-A/quick-build execution: prefer Git Bash over WSL,
+  pass POSIX relative hook paths, and identify Windows executables by native
+  suffix instead of POSIX executable bits.
+- Update quick-build tests to assert the actual produced binary name.
+
 ## 0.4.5 (2026-10-21)
 
 - Add an MPI/accelerator transport recommendation: prefer OpenMPI+UCX with

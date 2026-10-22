@@ -21,6 +21,8 @@ import sys
 import tempfile
 from typing import Dict, List, Optional, Union
 
+from scnet_platform import find_bash
+
 
 CHECK_IDS = (
     "entrypoint",
@@ -81,7 +83,7 @@ def _run_hook(root: Path, env_overrides: Optional[Dict[str, str]] = None) -> sub
     env.update(env_overrides or {})
     env["SCNET_LEVEL_A_ROOT"] = str(root)
     return subprocess.run(
-        ["bash", str(run)],
+        [find_bash(), run.as_posix()],
         cwd=root,
         env=env,
         text=True,
@@ -95,7 +97,7 @@ def _run_env(root: Path) -> subprocess.CompletedProcess[str]:
     if not env_script.is_file() or env_script.is_symlink():
         raise ValueError("runtime/scripts/env.sh is missing or linked")
     return subprocess.run(
-        ["bash", "-c", "set -euo pipefail; source runtime/scripts/env.sh; env"],
+        [find_bash(), "-c", "set -euo pipefail; source runtime/scripts/env.sh; env"],
         cwd=root,
         text=True,
         capture_output=True,
@@ -126,7 +128,13 @@ def _post_install(root: Path) -> subprocess.CompletedProcess[str] | None:
         return None
     if post.is_symlink() or not post.is_file():
         raise ValueError("runtime/scripts/post.sh is missing or linked")
-    return subprocess.run(["bash", str(post)], cwd=root, text=True, capture_output=True, timeout=30)
+    return subprocess.run(
+        [find_bash(), post.relative_to(root).as_posix()],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        timeout=30,
+    )
 
 
 def _row(check_id: str, status: str, detail: str = "") -> dict:

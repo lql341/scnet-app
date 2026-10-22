@@ -28,7 +28,7 @@ class QuickBuildTests(unittest.TestCase):
         self.assertEqual(result["build_system"], "cmake")
         self.assertFalse(result["compute_verified"])
         self.assertEqual(result["smoke"], "passed")
-        self.assertTrue((output / "runtime/app/bin/cpu_smoke").is_file())
+        self.assertTrue((output / "runtime/app/bin" / result["binary"]).is_file())
         self.assertTrue((output / "smoke-0.1.0-cpu.tar").is_file())
         self.assertEqual(subprocess.run(
             [sys.executable, str(output / "scripts/check.py"), str(output / "results")],
@@ -42,7 +42,7 @@ class QuickBuildTests(unittest.TestCase):
     def test_make_build_is_detected(self):
         output, result = self.run_build("cpu-make", "scnet-make")
         self.assertEqual(result["build_system"], "make")
-        self.assertTrue((output / "runtime/app/bin/make_smoke").is_file())
+        self.assertTrue((output / "runtime/app/bin" / result["binary"]).is_file())
 
     def test_bad_source_and_existing_output_fail_closed(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -18,6 +18,7 @@ from typing import Optional
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import scnet_app
+from scnet_platform import find_bash, is_executable
 
 
 def source_sha256(source: Path) -> str:
@@ -44,12 +45,14 @@ def detect_build_system(source: Path) -> str:
 def find_binary(root: Path, requested: Optional[str]) -> Path:
     if requested:
         path = root / requested
-        if not path.is_file() or not os.access(path, os.X_OK):
+        if os.name == "nt" and not path.exists() and not path.suffix:
+            path = path.with_suffix(".exe")
+        if not path.is_file() or not is_executable(path):
             raise ValueError("built executable not found: " + requested)
         return path
     candidates = []
     for path in sorted(root.rglob("*")):
-        if not path.is_file() or not os.access(path, os.X_OK):
+        if not path.is_file() or not is_executable(path):
             continue
         relative = path.relative_to(root)
         if any(part in {"CMakeFiles", ".git", "__pycache__"} for part in relative.parts):
@@ -185,7 +188,7 @@ def build(source: Path, output: Path, name: str, upstream: str, smoke_input: str
         text = text.replace("本应用尚未验证。", "本应用已通过本地 CPU smoke 测试。")
         markdown.write_text(text, encoding="utf-8")
 
-    run = subprocess.run(["bash", "scripts/run.sh"], cwd=destination, text=True,
+    run = subprocess.run([find_bash(), "scripts/run.sh"], cwd=destination, text=True,
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if run.returncode:
         raise ValueError("generated CPU smoke failed: " + run.stderr.strip())
