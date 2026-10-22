@@ -4,18 +4,19 @@
 
 [scnet-hashcat](https://github.com/lql341/scnet-hashcat)当前作为以后 SCNet 应用 skill 的运行候选参考，
 不是永久科学标杆。应用晋级前应先按[参考应用评选规则](../roadmap/reference-application-rubric.md)评估。
-下列链接固定到已检查提交 `16beee596194c3c17e7fd507eab911562725afd7`，更新引用前须检查差异。
+下列链接固定到已检查提交 `e054b16d37789b9aa92bf2d53b104a5acf487e9d`，更新引用前须检查差异。
 它处理授权的离线密码恢复；新应用复用工程做法，并保留自己的输入、语义及正确性标准。
 
 | 可复用要求 | 实现参考 |
 | --- | --- |
-| 英文默认、中文对应、区分安装与远端前置条件、一句话 agent 提示语 | [README](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/README_CN.md)及[安装说明](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/references/installation_CN.md) |
-| 明确资源目标、上传输入、运行清单、限时生命周期和产物回收 | [hc.py](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/scripts/hc.py) |
-| 集群 module/运行时前置条件、单协调器、srun rank、独立 rank 产物及失败传播 | [hc-node.sh](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/scripts/remote/hc-node.sh) |
-| 输入切分、支持模式及应用限制 | [并行化说明](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/references/parallelization_CN.md) |
-| 声明合成输入、计算节点结果及结论适用范围 | [验证记录](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/references/validation_CN.md) |
-| 单 skill 入口及内嵌 pinned OpenAPI adapter | [架构说明](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/references/architecture_CN.md)及[vendor 清单](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/scripts/vendor-manifest.json) |
-| Adapter 来源完整性和校验 | [vendor manifest 测试](https://github.com/lql341/scnet-hashcat/blob/16beee596194c3c17e7fd507eab911562725afd7/tests/test_vendor_manifest.py) |
+| 英文默认、中文对应、区分安装与远端前置条件、一句话 agent 提示语 | [README](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/README_CN.md)及[安装说明](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/references/installation_CN.md) |
+| 新账户首次使用：开通、凭证、module、离线 dry-run | [首次使用](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/references/first-use.md) |
+| 明确资源目标、上传输入、运行清单、限时生命周期和产物回收 | [hc.py](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/scripts/hc.py) |
+| 集群 module/运行时前置条件、单协调器、srun rank、独立 rank 产物及失败传播 | [hc-node.sh](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/scripts/remote/hc-node.sh) |
+| 输入切分、支持模式及应用限制 | [并行化说明](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/references/parallelization_CN.md) |
+| 声明合成输入、计算节点结果及结论适用范围 | [验证记录](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/references/validation_CN.md) |
+| 单 skill 入口及内嵌 pinned OpenAPI adapter | [架构说明](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/references/architecture_CN.md)及[vendor 清单](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/scripts/vendor-manifest.json) |
+| Adapter 来源完整性和校验 | [vendor manifest 测试](https://github.com/lql341/scnet-hashcat/blob/e054b16d37789b9aa92bf2d53b104a5acf487e9d/tests/test_vendor_manifest.py) |
 
 ## 采用标杆时保留实现边界
 

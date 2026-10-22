@@ -59,6 +59,25 @@ backend 版本和产品机型会改变命名。已配置的 DCU 应用必须在
 远端执行始终是 Linux，即使本地智能体运行在 Windows、macOS 或 Linux。远端
 路径保持 POSIX，本地编排/检查器保持跨平台。
 
+## 派生应用 skill 契约
+
+从本规范派生的每个应用 skill 必须提供：
+
+- **单入口：** 用户只安装/加载应用 skill。它可以内嵌 pinned 最小 adapter，或调用
+  已安装的 `scnet-hpc` CLI；不得要求加载两个 skill，也不得创建第二套凭证库。
+- **首次使用路径：** 提供简短 onboarding 文档和本地 `doctor` 或等价只读检查，
+  在提交任何远端作业前可运行。必须区分：未开通 SCNet 账号/资源、缺少凭证、未选
+  区域/队列、缺少 module/部署、缺少设备证据。
+- **凭证契约：** 接受 `SCNET_OPENAPI_USER`、`SCNET_OPENAPI_ACCESS_KEY`、
+  `SCNET_OPENAPI_SECRET_KEY` 或共享 `scnet-hpc-openapi` 系统凭证库。不得在聊天中
+  索要密钥，不得把密钥写入项目配置，不得启动隐藏的交互输入。
+- **离线第一步：** 输入检查、规划和 `--dry-run` 必须在无凭证、无实时集群时可用。
+  远端变更需要明确授权。
+- **可操作失败：** 错误必须说明缺少什么，并给出下一条本地命令或官方获取步骤，
+  不能只抛 API 异常。
+- **测试与元数据：** 测试首次使用/doctor 路径和 adapter 契约；用
+  `<runtime><version>-<target>` 记录 module/backend 版本和目标。
+
 ## 钩子职责
 
 run.sh 在远端运行目录执行，须使用预期设备/运行时，执行有限任务，将产物写入

@@ -70,6 +70,28 @@ publishes them.
 Remote execution is Linux even when the local agent host is Windows, macOS or
 Linux. Keep remote paths POSIX and local orchestration/checkers cross-platform.
 
+## Derived application skill contract
+
+Every application skill derived from this specification must provide:
+
+- **Single entry:** the user installs/loads only the application skill. It may
+  embed a pinned minimal adapter or call an installed `scnet-hpc` CLI; it must not
+  require loading two skills or create a second credential store.
+- **First-use path:** a short onboarding reference and a local `doctor` or
+  equivalent read-only check that works before any remote job. It must distinguish
+  no SCNet account/resource activation, missing credentials, no selected
+  region/queue, missing module/deployment and missing device evidence.
+- **Credential contract:** accept `SCNET_OPENAPI_USER`,
+  `SCNET_OPENAPI_ACCESS_KEY`, `SCNET_OPENAPI_SECRET_KEY` or the shared
+  `scnet-hpc-openapi` OS credential store. Never ask for secrets in chat, never
+  store secrets in project config, and never launch a hidden interactive prompt.
+- **Offline first step:** input checks, planning and `--dry-run` must work without
+  credentials or a live cluster. Remote mutation requires explicit authorization.
+- **Actionable failure:** errors must say what is missing and give the exact next
+  local command or official acquisition step, not only an API exception.
+- **Tests and metadata:** test the first-use/doctor paths and adapter contract;
+  record module/backend version and target using `<runtime><version>-<target>`.
+
 ## Hooks
 
 run.sh runs in the remote run directory. It must select the intended device/runtime,

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 (2026-10-21)
+
+- Add the mandatory derived-application contract: single entry, first-use
+  onboarding, local doctor, shared credential contract, offline dry-run,
+  actionable failures and first-use tests.
+- Require the same external contract for embedded-adapter and installed-CLI
+  application skills.
+
 ## 0.5.3 (2026-10-21)
 
 - Update the scnet-hashcat reference pin to the 0.2.3 vendor-manifest release.
