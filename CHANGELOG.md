@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.5 (2026-10-21)
+
+- Add an MPI/accelerator transport recommendation: prefer OpenMPI+UCX with
+  Slurm PMIx, balanced allocation, profile-driven HCA selection and HCOLL
+  disabled when it fails or regresses; treat PMPI/OB1 as a fallback and measure
+  GPU-aware communication rather than inferring benefit from detection.
+
 ## 0.4.4 (2026-10-21)
 
 - Require user-level module/prefix assumptions and explicit blank-account

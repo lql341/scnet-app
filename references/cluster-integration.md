@@ -47,6 +47,21 @@ user. The [srun documentation](https://slurm.schedmd.com/srun.html) describes jo
 steps and resource binding; the installed version and site configuration govern
 the actual launch policy.
 
+## MPI and accelerator transport
+
+For MPI applications on accelerator nodes, prefer the site's OpenMPI with UCX
+and Slurm PMIx. Use the matching `srun` PMIx/MPI type and a balanced
+`--ntasks-per-node` allocation; do not let ranks concentrate on one node.
+
+Keep HCA/interface selection profile-driven rather than hardcoded. Disable HCOLL
+when it fails or regresses; accelerator paths in particular can fail during
+HCOLL handler setup. PMPI/OB1/TCP is a compatibility fallback, not the default.
+If GPU-aware MPI is requested, measure direct communication against host-staged
+communication; detecting a GPU-aware build is not a performance result.
+
+Record launcher, PMIx/MPI transport, rank/GPU topology and allocation balance
+with any multi-node result.
+
 ## Two packages, one reproducible deployment
 
 The **agent skill package** contains SKILL.md, metadata, bilingual install/use

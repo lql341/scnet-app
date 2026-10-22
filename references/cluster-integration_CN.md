@@ -36,6 +36,20 @@ Slurm [sbatch 文档](https://slurm.schedmd.com/sbatch.html)区分提交与分�
 并说明不会代用户传输输入文件；[srun 文档](https://slurm.schedmd.com/srun.html)
 说明作业步及资源绑定。实际启动规则以已安装版本和集群配置为准。
 
+## MPI 与加速器传输
+
+加速器节点上的 MPI 应用优先使用站点 OpenMPI + UCX + Slurm PMIx；使用匹配的
+`srun` PMIx/MPI 类型和平衡的 `--ntasks-per-node` 分配，避免 rank 集中到一个
+节点。
+
+HCA/接口选择保持 profile 驱动，不要硬编码。HCOLL 失败或性能回退时关闭；
+加速器路径可能在 HCOLL handler setup 阶段失败。PMPI/OB1/TCP 是兼容 fallback，
+不是默认。若要求 GPU-aware MPI，必须实测 direct 通信与 host-staged 通信；
+检测到 GPU-aware 构建不等于性能结果。
+
+任何多节点结果都要记录 launcher、PMIx/MPI transport、rank/GPU 拓扑和分配
+平衡。
+
 ## 两类包与可复现部署
 
 **Agent skill 包**包含 SKILL.md、元数据、中英文安装使用说明、app.json、钩子、
