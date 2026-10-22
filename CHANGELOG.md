@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 (2026-10-21)
+
+- Refine the application/scnet-hpc architecture for a single-skill user entry:
+  allow a pinned embedded OpenAPI adapter (the scnet-hashcat pattern) or an
+  installed scnet-hpc CLI, without requiring users to load two skills.
+- Keep the boundary against duplicating the full SSH/scheduler stack or creating
+  a second credential store.
+
 ## 0.5.0 (2026-10-21)
 
 - Codify the application/entry-point architecture: application skills are

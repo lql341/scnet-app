@@ -13,7 +13,11 @@ respond in the user's language.
 ## Boundaries
 
 - scnet-hpc owns credentials, connections, resources, file transfer and scheduler
-  lifecycle. Call its CLI; do not vendor another transport/authentication client.
+  lifecycle. The application skill is the single entry point: either embed a
+  minimal, pinned OpenAPI adapter with a vendor manifest (as scnet-hashcat does)
+  or call the installed scnet-hpc CLI. Do not duplicate the full SSH/scheduler
+  stack or create a second credential store; do not require users to load two
+  skills for the normal workflow.
 - Bind applications to explicit SCNet resources and site packaging/scheduler policy.
   Read references/cluster-integration.md; do not equate a valid package with runtime
   certification. Use references/hashcat-reference.md as an operational candidate

@@ -62,24 +62,29 @@ communication; detecting a GPU-aware build is not a performance result.
 Record launcher, PMIx/MPI transport, rank/GPU topology and allocation balance
 with any multi-node result.
 
-## Application entry point and scnet-hpc
+## Single-skill entry and scnet-hpc
 
-`scnet-app` is the authoring standard, not a runtime dependency. Application
-skills are entry points; `scnet-hpc` is the shared infrastructure/contrib
-capability.
+`scnet-app` is the authoring standard, not a runtime dependency. The application
+skill is the single entry the user installs or loads; `scnet-hpc` is the shared
+infrastructure/contrib capability, not a second skill the user must load.
 
-- Resolve `scnet-hpc` from `SCNET_HPC_ROOT`, a sibling `../scnet-hpc`, or the
-  installed agent skill directory. Enforce a tested minimum version and fail
-  closed with a clear message.
-- The application owns its cases, commands, device/runtime setup and acceptance
-  checks. `scnet-hpc` owns credentials, transport, scheduler lifecycle and file
-  operations. Optional application `contrib/` may orchestrate, but must call the
-  `scnet-hpc` CLI rather than implement a second backend.
-- Application SemVer is independent. Record the tested `scnet-hpc` range and
-  version in evidence; do not copy the infrastructure version.
-- New application skills must not vendor transport/credential code. An existing
-  vendored adapter is a transitional compatibility fallback, not the target
-  architecture.
+Two integration modes are supported:
+
+1. **Embedded adapter (preferred for OpenAPI-only applications):** vendor a
+   minimal, pinned adapter derived from `scnet-hpc`, as `scnet-hashcat` does. Keep
+   a vendor manifest with upstream repository, commit, license, file list and
+   checksums; reuse the same credential-store/config conventions; do not add an
+   SSH fallback or a second credential store; test the adapter contract.
+2. **Installed CLI:** call an installed `scnet-hpc` CLI for advanced first-use,
+   SSH, deployment or diagnosis. Resolve it from `SCNET_HPC_ROOT`, a sibling
+   `../scnet-hpc`, or the installed skill directory; enforce a tested minimum
+   version and fail closed. The user must not have to load `scnet-hpc` as a
+   second skill for the normal application workflow.
+
+In both modes, the application owns its cases, commands, device/runtime setup and
+acceptance checks; `scnet-hpc` owns credentials, transport, scheduler lifecycle
+and file operations. Do not copy the full SSH/scheduler stack. Application SemVer
+is independent; record the tested upstream commit or minimum version in evidence.
 
 ## Two packages, one reproducible deployment
 
