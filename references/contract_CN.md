@@ -78,6 +78,34 @@ backend 版本和产品机型会改变命名。已配置的 DCU 应用必须在
 - **测试与元数据：** 测试首次使用/doctor 路径和 adapter 契约；用
   `<runtime><version>-<target>` 记录 module/backend 版本和目标。
 
+## 规范 adapter 与首次使用交互
+
+规范内嵌 adapter 是 `scnet-hashcat/scripts/scnet_lite.py`（以及未修改的
+`scnet_credentials.py`、`scnet_version.py` helper）。派生应用如果内嵌 adapter，
+必须原样复制该实现，保留 vendor manifest（上游仓库、commit、许可证、checksum），
+并在测试中校验 adapter checksum 和必需方法面。不得为单个应用 fork 传输或凭证层。
+调用已安装 `scnet-hpc` CLI 的应用也必须提供相同的外部行为。
+
+adapter 最小接口：区域选择、account/queues/limits、远端 mkdir/list/upload/download、
+submit、wait、job detail。SSH 不属于该 adapter，且不得静默 fallback。
+
+### 首次使用交互契约
+
+每个派生应用必须支持非秘密、机器可读的首次使用检查，并遵循以下 agent 流程：
+
+1. 运行本地 JSON 状态检查，例如 `doctor --json`。
+2. 每次只报告一个缺失类别：账号/资源开通、凭证、region/queue、module/部署、
+   设备证据。
+3. 每次只问一个问题；不得在聊天中索要 AK/SK、私钥或凭证文件内容。
+4. 缺少凭证时，给出用户在**自己的终端**执行的准确命令；有 scnet-hpc 时用
+   `scnet-hpc setup new --mode openapi`，否则用三个 `SCNET_OPENAPI_*` 环境变量。
+   agent 工具调用不得启动隐藏的密钥输入。
+5. 未开通账号/资源时，说明官方开通路径，并在认证或提交前停止。
+6. 用户操作后重新运行检查。只有就绪后才选择 region/queue、探测 module 并提交
+   有边界的作业。
+7. 就绪前仍允许离线输入检查和 `--dry-run`。
+8. 测试至少覆盖缺少凭证和缺少 region 分支；检查不得输出密钥值。
+
 ## 钩子职责
 
 run.sh 在远端运行目录执行，须使用预期设备/运行时，执行有限任务，将产物写入

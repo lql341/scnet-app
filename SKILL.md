@@ -24,11 +24,15 @@ respond in the user's language.
 ## Boundaries
 
 - scnet-hpc owns credentials, connections, resources, file transfer and scheduler
-  lifecycle. The application skill is the single entry point: either embed a
-  minimal, pinned OpenAPI adapter with a vendor manifest (as scnet-hashcat does)
-  or call the installed scnet-hpc CLI. Do not duplicate the full SSH/scheduler
-  stack or create a second credential store; do not require users to load two
-  skills for the normal workflow.
+  lifecycle. The application skill is the single entry point: embed the canonical
+  pinned OpenAPI adapter (the scnet-hashcat `scnet_lite.py` surface) or call the
+  installed scnet-hpc CLI. Copy the canonical adapter unchanged, keep a vendor
+  manifest/checksum test, and do not duplicate the full SSH/scheduler stack or
+  create a second credential store. Do not require users to load two skills.
+- Every derived application must provide the first-use interaction contract in
+  references/contract.md: machine-readable doctor status, one-question-at-a-time
+  guidance, no secrets in chat, account/resource activation separated from
+  credentials, and offline dry-run before readiness.
 - Bind applications to explicit SCNet resources and site packaging/scheduler policy.
   Read references/cluster-integration.md; do not equate a valid package with runtime
   certification. Use references/hashcat-reference.md as an operational candidate

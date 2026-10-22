@@ -92,6 +92,42 @@ Every application skill derived from this specification must provide:
 - **Tests and metadata:** test the first-use/doctor paths and adapter contract;
   record module/backend version and target using `<runtime><version>-<target>`.
 
+## Canonical application adapter and first-use interaction
+
+The canonical embedded adapter is `scnet-hashcat/scripts/scnet_lite.py` (with the
+unmodified `scnet_credentials.py` and `scnet_version.py` helpers). A derived
+application that embeds an adapter must copy that implementation unchanged, keep
+a vendor manifest with upstream repository/commit/license/checksums, and verify
+the adapter checksum and required method surface in tests. Do not fork a
+per-application transport or credential layer. Applications that call an
+installed `scnet-hpc` CLI instead must expose the same external behavior.
+
+The minimum adapter surface is: region selection, account/queues/limits, remote
+mkdir/list/upload/download, submit, wait and job detail. SSH is not part of this
+adapter and must never be a silent fallback.
+
+### First-use interaction contract
+
+Every derived application must support a non-secret, machine-readable first-use
+check and this agent loop:
+
+1. Run the local check with a JSON status, for example `doctor --json`.
+2. Report one missing category at a time: account/resource activation,
+   credentials, region/queue, module/deployment, or device evidence.
+3. Ask one question at a time; do not request AK/SK, private keys or credential
+   file contents in chat.
+4. For missing credentials, provide the exact command to run in the user's own
+   terminal, using `scnet-hpc setup new --mode openapi` when available, or the
+   three `SCNET_OPENAPI_*` environment variables. Never launch a hidden
+   interactive secret prompt from an agent tool call.
+5. For no account/resource activation, explain the official activation path and
+   stop before attempting authentication or submission.
+6. After the user acts, re-run the check. Only then select a region/queue, probe
+   the module and submit a bounded job.
+7. Offline input checks and `--dry-run` remain available before readiness.
+8. Tests must cover at least the missing-credential and missing-region branches,
+   and the check must never print secret values.
+
 ## Hooks
 
 run.sh runs in the remote run directory. It must select the intended device/runtime,

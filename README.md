@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.6.0
+Version: 0.6.1
 
 A meta-skill for authoring application skills for HPC, AI4S and scientific
 workloads on [SCNet](https://www.scnet.cn). `scnet-hpc` is the foundation;

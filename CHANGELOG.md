@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1 (2026-10-21)
+
+- Standardize the canonical embedded adapter surface and require checksum/method
+  tests for copied adapters.
+- Add the first-use interaction contract: JSON doctor status, one-question-at-a-time
+  guidance, no secrets in chat, account/resource activation separated from
+  credentials, and offline dry-run before readiness.
+
 ## 0.6.0 (2026-10-21)
 
 - Add the mandatory derived-application contract: single entry, first-use
