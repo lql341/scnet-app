@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3 (2026-10-21)
+
+- Update the scnet-hashcat reference pin to the 0.2.3 vendor-manifest release.
+
 ## 0.5.2 (2026-10-21)
 
 - Refresh the scnet-hashcat reference to the current single-skill embedded-adapter
