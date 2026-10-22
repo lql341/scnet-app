@@ -11,6 +11,9 @@
   `check.py`, onboarding checks in `check_contract.py`.
 - Refresh the scnet-hashcat reference to the 0.2.6 offline-doctor and
   adapter-pin-check commit, and record conformance with scnet-hpc 0.6.14.
+- Rewrite the public history to remove maintainer paths, site-specific
+  region/queue values and scheduler job IDs; force-update main and the retained
+  codex branches after verifying the remote refs.
 
 ## 0.6.1 (2026-10-21)
 
