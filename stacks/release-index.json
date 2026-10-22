@@ -34,7 +34,7 @@
       "application": "scnet-gromacs",
       "skill_version": "0.10.1",
       "adapter": "scripts/scnet_lite.py",
-      "adapter_commit": "c2dc6d239ddee2c724e900cc3b5e37facd911d2e",
+      "adapter_commit": "2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2",
       "scnet_hpc_min": "0.6.13",
       "scnet_hpc_tested": "0.6.14",
       "runtime": "OpenMPI 5 + UCX + HIP",
