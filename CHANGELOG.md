@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0 (2026-10-21)
+
+- Codify the application/entry-point architecture: application skills are
+  entry points, `scnet-hpc` is the shared contrib capability, and `scnet-app`
+  is the authoring standard.
+- Require dependency resolution via `SCNET_HPC_ROOT`, sibling `../scnet-hpc` or
+  the installed skill, with a tested minimum version and no vendored transport or
+  credential layer for new skills.
+
 ## 0.4.6 (2026-10-21)
 
 - Fix Windows local level-A/quick-build execution: prefer Git Bash over WSL,

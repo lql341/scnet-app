@@ -62,6 +62,25 @@ communication; detecting a GPU-aware build is not a performance result.
 Record launcher, PMIx/MPI transport, rank/GPU topology and allocation balance
 with any multi-node result.
 
+## Application entry point and scnet-hpc
+
+`scnet-app` is the authoring standard, not a runtime dependency. Application
+skills are entry points; `scnet-hpc` is the shared infrastructure/contrib
+capability.
+
+- Resolve `scnet-hpc` from `SCNET_HPC_ROOT`, a sibling `../scnet-hpc`, or the
+  installed agent skill directory. Enforce a tested minimum version and fail
+  closed with a clear message.
+- The application owns its cases, commands, device/runtime setup and acceptance
+  checks. `scnet-hpc` owns credentials, transport, scheduler lifecycle and file
+  operations. Optional application `contrib/` may orchestrate, but must call the
+  `scnet-hpc` CLI rather than implement a second backend.
+- Application SemVer is independent. Record the tested `scnet-hpc` range and
+  version in evidence; do not copy the infrastructure version.
+- New application skills must not vendor transport/credential code. An existing
+  vendored adapter is a transitional compatibility fallback, not the target
+  architecture.
+
 ## Two packages, one reproducible deployment
 
 The **agent skill package** contains SKILL.md, metadata, bilingual install/use

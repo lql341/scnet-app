@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.4.6
+Version: 0.5.0
 
 A meta-skill for integrating HPC, AI4S and scientific applications with
 [SCNet](https://www.scnet.cn) compute resources. It standardizes **resource binding,

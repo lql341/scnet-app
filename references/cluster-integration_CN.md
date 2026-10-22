@@ -50,6 +50,21 @@ HCA/接口选择保持 profile 驱动，不要硬编码。HCOLL 失败或性能�
 任何多节点结果都要记录 launcher、PMIx/MPI transport、rank/GPU 拓扑和分配
 平衡。
 
+## 应用入口与 scnet-hpc
+
+`scnet-app` 是编写规范，不是运行时依赖。应用 skill 是入口；`scnet-hpc` 是共享的
+基础设施/contrib 能力。
+
+- 从 `SCNET_HPC_ROOT`、同级 `../scnet-hpc` 或已安装的 agent skill 目录解析
+  `scnet-hpc`；校验测试过的最低版本，缺失或不兼容时明确失败。
+- 应用负责 case、命令、设备/运行时环境和验收判据；`scnet-hpc` 负责凭证、
+  传输、调度器生命周期和文件操作。应用可选 `contrib/` 只做应用级编排，必须
+  调用 `scnet-hpc` CLI，不能实现第二套后端。
+- 应用 SemVer 独立；在证据中记录测试过的 `scnet-hpc` 范围，不复制基础设施
+  版本号。
+- 新应用 skill 不得 vendor 传输/凭证代码；已有 vendored adapter 是过渡兼容
+  fallback，不是目标架构。
+
 ## 两类包与可复现部署
 
 **Agent skill 包**包含 SKILL.md、元数据、中英文安装使用说明、app.json、钩子、
