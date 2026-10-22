@@ -163,7 +163,7 @@ a submit command. Pass arrays to subprocess without shell=True. The remote Bash
 body quotes directory/module/hook arguments. Keep plans private: they contain
 local/remote paths even though no secrets are read.
 
-The bridge uses scnet-hpc >=0.6.13, with conformance tested against 0.6.14. Resolve
+The bridge uses scnet-hpc >=0.6.13, with conformance tested against 0.6.15. Resolve
 its root via --scnet-hpc, SCNET_HPC_ROOT or the Codex skill directory. It never
 silently selects SSH or implements its own authentication, token cache or file API.
 Application/scnet-hpc releases have independent versions.

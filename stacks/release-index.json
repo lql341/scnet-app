@@ -2,10 +2,10 @@
   "schema_version": 1,
   "updated": "2026-10-22",
   "components": {
-    "scnet-app": "0.6.2",
-    "scnet-hpc": "0.6.14",
+    "scnet-app": "0.6.3",
+    "scnet-hpc": "0.6.15",
     "scnet-hashcat": "0.2.6",
-    "scnet-gromacs": "0.10.1",
+    "scnet-gromacs": "0.10.2",
     "scientific-dcu-porting": "0.3.1"
   },
   "entries": [
@@ -15,7 +15,7 @@
       "adapter": "scripts/scnet_lite.py",
       "adapter_commit": "2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2",
       "scnet_hpc_min": "0.6.13",
-      "scnet_hpc_tested": "0.6.14",
+      "scnet_hpc_tested": "0.6.15",
       "runtime": "dtk 26.04 / HIP",
       "target": "hygon-z100",
       "module": "hashcat/7.1.2-dtk26.04-z100",
@@ -32,11 +32,11 @@
     },
     {
       "application": "scnet-gromacs",
-      "skill_version": "0.10.1",
+      "skill_version": "0.10.2",
       "adapter": "scripts/scnet_lite.py",
       "adapter_commit": "2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2",
       "scnet_hpc_min": "0.6.13",
-      "scnet_hpc_tested": "0.6.14",
+      "scnet_hpc_tested": "0.6.15",
       "runtime": "OpenMPI 5 + UCX + HIP",
       "target": "hygon-z100",
       "module": "gromacs/2026.3-dtk26.04-z100; gromacs/2026.4-dtk26.04-z100",

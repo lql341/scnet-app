@@ -2,7 +2,7 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.6.2
+Version: 0.6.3
 
 A meta-skill for authoring application skills for HPC, AI4S and scientific
 workloads on [SCNet](https://www.scnet.cn). `scnet-hpc` is the foundation;
@@ -145,7 +145,7 @@ for formats, failure/timeout handling, source labels and privacy limits.
 | Stage | Required |
 | --- | --- |
 | init / validate | Local Python 3.8+ and this complete repository |
-| plan | Also a local scnet-hpc >=0.6.13; adapter tested with 0.6.14; no credentials/network |
+| plan | Also a local scnet-hpc >=0.6.13; adapter tested with 0.6.15; no credentials/network |
 | doctor | Also SCNet access, enabled region/queue and scnet-hpc credentials |
 | record | Authored checks, trusted local checker and explicit collected artifacts; optional --job-id also needs the doctor prerequisites |
 | Real application job | Account balance/quota, staged input/dependencies, shared writable storage, compatible application/DTK environment and requested devices |

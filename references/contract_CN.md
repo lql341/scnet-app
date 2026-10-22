@@ -133,7 +133,7 @@ planner 不执行命令，只返回只读预检、mkdir/显式上传、scnet-hpc
 完成钩子后的提交参数数组。调用数组时不用 shell=True；远端 Bash 正文引用路径、
 module 和钩子参数。计划虽不读取密钥，仍含本地/远端路径，应私密保存。
 
-桥接要求 scnet-hpc >=0.6.13，按 0.6.14 做协议验证。通过 --scnet-hpc、SCNET_HPC_ROOT
+桥接要求 scnet-hpc >=0.6.13，按 0.6.15 做协议验证。通过 --scnet-hpc、SCNET_HPC_ROOT
 或 Codex skill 目录定位，不静默切 SSH，不自行认证、缓存 token 或实现文件 API。
 应用与 scnet-hpc 独立版本。
 

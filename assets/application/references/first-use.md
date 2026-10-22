@@ -40,13 +40,17 @@ python3 scripts/doctor.py --json
 python3 scripts/doctor.py --require-openapi
 ```
 
-The generated bridge doctor checks environment credentials and `app.json`
-region/queue only. It reports `shared_store=unknown`; replace the credential
-probe if this application embeds the pinned adapter. It never prints secret
-values and never submits a job.
+The generated bridge template uses the `scnet-hpc` CLI for upload, submit, wait
+and collection. Its doctor therefore treats a missing `scnet-hpc` as a dependency
+blocker. It reuses `scnet-hpc doctor --json --no-network` to inspect the shared
+credential store; it does not create a second credential store. If the store
+cannot be inspected, credentials are reported as `unknown`, not `missing`.
+Only an application that actually embeds the pinned adapter may treat
+`scnet-hpc` as optional.
 
 `openapi_ready` covers local prerequisites only. It does not prove account
-activation, module deployment or device availability.
+activation, module deployment or device availability. It never prints secret
+values and never submits a job.
 
 ## 4. Application readiness
 

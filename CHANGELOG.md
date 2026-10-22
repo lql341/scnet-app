@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.3 (2026-10-22)
+
+- Make the generated bridge doctor reuse `scnet-hpc --json doctor --no-network`
+  for the shared credential store, report uncheckable credentials as unknown,
+  and treat a missing `scnet-hpc` CLI as a dependency blocker.
+- Add store-only credential and missing-CLI regressions; keep the numerical
+  checker fail-closed.
+- Record conformance with scnet-hpc 0.6.15 and GROMACS 0.10.2.
+
 ## 0.6.2 (2026-10-22)
 
 - Sanitize tracked OpenFOAM validation paths and remove scheduler job IDs from

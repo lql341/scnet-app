@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-版本：0.6.2
+版本：0.6.3
 
 面向[超算互联网（SCNet）](https://www.scnet.cn)算力的科学应用集成与交付元 skill，
 用于将 HPC、AI4S 和科学智能计算应用整理为统一的应用 skill 和可审阅作业计划，
@@ -99,7 +99,7 @@ python3 scripts/scnet_app.py record ../scnet-myapp --results ./collected --run-i
 | 阶段 | 前置条件 |
 | --- | --- |
 | init / validate | 本地 Python 3.8+ 和完整仓库 |
-| plan | 另需本地 scnet-hpc >=0.6.13，适配接口按 0.6.14 验证；不需凭证/联网 |
+| plan | 另需本地 scnet-hpc >=0.6.13，适配接口按 0.6.15 验证；不需凭证/联网 |
 | doctor | 另需 SCNet 网络、已开通区域/队列、scnet-hpc 凭证 |
 | record | 已实现的 checks、受信任的本地检查器及明确的回收产物；选用 --job-id 时还需 doctor 的前置条件 |
 | 真实应用作业 | 余额/配额、已准备输入/依赖、共享可写存储、兼容应用/DTK 环境和所申请设备 |
