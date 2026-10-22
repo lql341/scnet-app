@@ -118,6 +118,17 @@ def main():
                 "generated first-use contract check failed: "
                 + (completed.stderr or completed.stdout).strip()
             )
+        tests = subprocess.run(
+            [sys.executable, "-m", "unittest", "discover", "-s", "tests"],
+            cwd=destination,
+            text=True,
+            capture_output=True,
+        )
+        if tests.returncode != 0:
+            raise ValueError(
+                "generated first-use tests failed: "
+                + (tests.stderr or tests.stdout).strip()
+            )
     print("Repository and generated package validation passed; compute remains unverified.")
 
 
