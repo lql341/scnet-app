@@ -5,7 +5,7 @@
     "scnet-app": "0.6.3",
     "scnet-hpc": "0.6.15",
     "scnet-hashcat": "0.2.6",
-    "scnet-gromacs": "0.10.2",
+    "scnet-gromacs": "0.10.3",
     "scientific-dcu-porting": "0.3.1"
   },
   "entries": [
@@ -32,7 +32,7 @@
     },
     {
       "application": "scnet-gromacs",
-      "skill_version": "0.10.2",
+      "skill_version": "0.10.3",
       "adapter": "scripts/scnet_lite.py",
       "adapter_commit": "2f44b1b0fc980f6a159bd14d2cd5dfe5398f0be2",
       "scnet_hpc_min": "0.6.13",

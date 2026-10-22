@@ -7,7 +7,7 @@
   and treat a missing `scnet-hpc` CLI as a dependency blocker.
 - Add store-only credential and missing-CLI regressions; keep the numerical
   checker fail-closed.
-- Record conformance with scnet-hpc 0.6.15 and GROMACS 0.10.2.
+- Record conformance with scnet-hpc 0.6.15 and GROMACS 0.10.3.
 
 ## 0.6.2 (2026-10-22)
 
