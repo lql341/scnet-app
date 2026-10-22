@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 (2026-10-21)
+
+- Refresh the scnet-hashcat reference to the current single-skill embedded-adapter
+  commit and add the vendor-manifest test to the reusable requirements.
+- State the exact DCU module/package naming form `<runtime><version>-<target>`.
+- Record the skill-role taxonomy: meta, foundation, application entry points and
+  porting capability.
+
 ## 0.5.1 (2026-10-21)
 
 - Refine the application/scnet-hpc architecture for a single-skill user entry:

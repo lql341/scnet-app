@@ -2,10 +2,12 @@
 
 English | [中文](README_CN.md)
 
-Version: 0.5.1
+Version: 0.5.2
 
-A meta-skill for integrating HPC, AI4S and scientific applications with
-[SCNet](https://www.scnet.cn) compute resources. It standardizes **resource binding,
+A meta-skill for authoring application skills for HPC, AI4S and scientific
+workloads on [SCNet](https://www.scnet.cn). `scnet-hpc` is the foundation;
+`scnet-*` repositories are application entry points; `scientific-dcu-porting`
+is a porting capability. It standardizes **resource binding,
 Slurm scheduling, cluster application packaging and result verification** through
 a consistent skill scaffold and a reviewable job plan.
 [scnet-hpc](https://github.com/lql341/scnet-hpc) supplies the infrastructure;

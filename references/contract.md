@@ -44,7 +44,8 @@ staging/build procedure; recursive dependency collection is not implemented.
 New applications should use the six-axis stack signature. The platform axis is
 included in evidence but does not change binary ABI naming; the backend version
 and product target do. A configured DCU application must include those values in
-both `delivery.json.module_name` and `delivery.json.package_name`.
+both `delivery.json.module_name` and `delivery.json.package_name`, using the
+`<runtime><version>-<target>` form (for example `dtk26.04-z100`).
 
 ## Validation tracks
 

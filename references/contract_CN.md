@@ -38,7 +38,8 @@ schema_version 保持 1，元 skill 版本为 0.4.1。缺新字段仍能读取�
 
 新应用应使用六轴栈签名。platform 轴进入证据但不改变二进制 ABI 命名；
 backend 版本和产品机型会改变命名。已配置的 DCU 应用必须在
-`delivery.json.module_name` 和 `delivery.json.package_name` 中同时体现后端版本和目标机型。
+`delivery.json.module_name` 和 `delivery.json.package_name` 中同时体现后端版本和
+目标机型，使用 `<runtime><version>-<target>` 形式（例如 `dtk26.04-z100`）。
 
 ## 验证轨道
 

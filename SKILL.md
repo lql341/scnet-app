@@ -10,6 +10,17 @@ SCNet application skill. For ordinary execution of an existing application skill
 use that application. Default documentation is English with Chinese counterparts;
 respond in the user's language.
 
+## Skill roles
+
+- `scnet-app`: meta/authoring standard; never a runtime dependency.
+- `scnet-hpc`: foundation capability for credentials, transport, scheduler and
+  file lifecycle.
+- `scnet-*` application skills: single entry points such as `scnet-gromacs` and
+  `scnet-hashcat`; they own application logic and may embed a pinned minimal
+  adapter or call the installed foundation CLI.
+- `scientific-dcu-porting`: porting/migration capability, not an application
+  entry point.
+
 ## Boundaries
 
 - scnet-hpc owns credentials, connections, resources, file transfer and scheduler

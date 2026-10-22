@@ -6,25 +6,30 @@ English | [中文](hashcat-reference_CN.md)
 candidate for future SCNet application skills, not a permanent scientific benchmark.
 Use the [reference application rubric](../roadmap/reference-application-rubric.md)
 before promoting any candidate. The links below pin reviewed commit
-`655ff24480c9ac6f01c7face01b7b9f91fa4d509`; review changes before updating the reference.
+`0ff2a928b49b719df070e2596ee6a11c31e7b930`; review changes before updating the reference.
 Its domain is authorized offline password recovery. Reuse its engineering patterns
 with the new application's own inputs, semantics and correctness criterion.
 
 | Reusable requirement | Reference implementation |
 | --- | --- |
-| English default, Chinese counterpart, installation vs remote prerequisites, one-sentence agent prompts | [README](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/README.md) and [installation](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/references/installation.md) |
-| Explicit resource target, staged inputs, run manifest, bounded job lifecycle and result collection | [hc.py](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/scripts/hc.py) |
-| Site module/runtime prerequisites, single coordinator, srun ranks, per-rank artifacts and failure propagation | [hc-node.sh](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/scripts/remote/hc-node.sh) |
-| Input partitioning, supported modes and workload-specific limits | [parallelization](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/references/parallelization.md) |
-| Compute-node results with declared synthetic inputs and scoped conclusions | [validation](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/references/validation.md) |
-| Explicit infrastructure provenance and maintenance obligations | [architecture](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/references/architecture.md) and [vendor manifest](https://github.com/lql341/scnet-hashcat/blob/655ff24480c9ac6f01c7face01b7b9f91fa4d509/scripts/vendor-manifest.json) |
+| English default, Chinese counterpart, installation vs remote prerequisites, one-sentence agent prompts | [README](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/README.md) and [installation](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/references/installation.md) |
+| Explicit resource target, staged inputs, run manifest, bounded job lifecycle and result collection | [hc.py](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/scripts/hc.py) |
+| Site module/runtime prerequisites, single coordinator, srun ranks, per-rank artifacts and failure propagation | [hc-node.sh](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/scripts/remote/hc-node.sh) |
+| Input partitioning, supported modes and workload-specific limits | [parallelization](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/references/parallelization.md) |
+| Compute-node results with declared synthetic inputs and scoped conclusions | [validation](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/references/validation.md) |
+| Single-skill entry with a pinned embedded OpenAPI adapter | [architecture](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/references/architecture.md) and [vendor manifest](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/scripts/vendor-manifest.json) |
+| Adapter provenance and integrity checks | [vendor manifest test](https://github.com/lql341/scnet-hashcat/blob/0ff2a928b49b719df070e2596ee6a11c31e7b930/tests/test_vendor_manifest.py) |
 
 ## Apply the benchmark without copying its boundaries
 
-- New scnet-app applications delegate infrastructure to the installed scnet-hpc CLI.
-  Hashcat currently vendors a focused OpenAPI derivative with a recorded upstream
-  version. This is a documented implementation difference, not the default template
-  for another copied authentication/file/job client.
+- The preferred single-skill pattern is an application entry point with a minimal,
+  pinned OpenAPI adapter derived from scnet-hpc, as hashcat does. Keep a vendor
+  manifest with upstream commit and checksums, reuse the shared credential store,
+  and add an integrity test. Do not copy the full SSH/scheduler stack or create a
+  second credential store.
+- Calling an installed scnet-hpc CLI is an alternative for advanced first-use,
+  SSH, deployment or diagnosis. Users should not have to load scnet-hpc as a
+  second skill for the normal application workflow.
 - Hashcat has an existing multi-node driver. The scnet-app v1 descriptor is
   single-node; referencing that driver does not add MPI, arrays or fan-out support.
   Hashcat was not generated by scnet-app and does not implement its app.json contract.
