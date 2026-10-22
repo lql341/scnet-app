@@ -139,7 +139,13 @@ class ApplicationTests(unittest.TestCase):
     @unittest.skipUnless(os.getenv("SCNET_HPC_TEST_ROOT"), "set SCNET_HPC_TEST_ROOT for real CLI conformance")
     def test_real_scnet_hpc_dry_run_contract_without_credentials(self):
         data = self.ready()
-        hpc = app.hpc_cli(Path(os.environ["SCNET_HPC_TEST_ROOT"]))
+        hpc_root = Path(os.environ["SCNET_HPC_TEST_ROOT"])
+        profiles = sorted((hpc_root / "clusters").glob("*.conf"))
+        if not profiles:
+            self.skipTest("scnet-hpc test root has no cluster profile")
+        data["scnet"]["cluster"] = profiles[0].stem
+        self.write(data)
+        hpc = app.hpc_cli(hpc_root)
         plan = app.plan(self.root, hpc, "/example/scnet-app/fresh-run")
         env = {key: value for key, value in os.environ.items() if not key.startswith("SCNET_OPENAPI_")}
         env["PYTHONIOENCODING"] = "utf-8"
